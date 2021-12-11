@@ -48,6 +48,6 @@ function Movable:setSpeed(s)
 end
 
 function Movable:move(dt)
-    self.x = self.x + (math.sin(math.rad(self.dir)) * (self.speed * (viewport.size / gamestate.range)) * dt / 2)
-    self.y = self.y - (math.cos(math.rad(self.dir)) * (self.speed * (viewport.size / gamestate.range)) * dt / 2)
+    self.x = self.x + (math.sin(math.rad(self.dir)) * (self.speed * (viewport.size / gamestate.range)) / 2)
+    self.y = self.y - (math.cos(math.rad(self.dir)) * (self.speed * (viewport.size / gamestate.range)) / 2)
 end

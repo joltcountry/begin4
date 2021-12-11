@@ -2,6 +2,15 @@ require 'objects'
 
 logs = {}
 trackers = {}
+
+buttons = {
+	nextturn = {
+		x=1500,y=1300,
+		label = "End Turn",
+		width = 200
+	}
+}
+
 function log(s)
 	table.insert(logs, s)
 end
@@ -27,7 +36,7 @@ end
 
 function love.load()
 log('loading')
-	love.window.setMode(1800,1500)
+	love.window.setMode(1800,1400)
 	love.window.setTitle('Fuck Tom Nelson!  No, sorry, that was mean.')
 	gamestate = { scale = 1, range = 30000, ringSpacing = 5000 }
 	viewport = { x = 0, y = 0, size = 1400 }
@@ -65,12 +74,15 @@ function love.draw()
 	end
 
 	if love.mouse.isDown(1) then
-		love.graphics.setLineWidth(3)
 		x, y = love.mouse.getPosition()
-		love.graphics.setColor(.9, .2, .2)
-		love.graphics.line(x, y, myShip:windowPositionX(), myShip:windowPositionY())
-		love.graphics.circle('fill', x, y, 10);
-		love.graphics.setLineWidth(1)
+		if x < viewport.size and y < viewport.size then
+			love.graphics.setLineWidth(3)
+			x, y = love.mouse.getPosition()
+			love.graphics.setColor(.9, .2, .2)
+			love.graphics.line(x, y, myShip:windowPositionX(), myShip:windowPositionY())
+			love.graphics.circle('fill', x, y, 10);
+			love.graphics.setLineWidth(1)
+		end
 	end
 
 	love.graphics.setColor(1,1,1);
@@ -83,6 +95,11 @@ function love.draw()
 
 	love.graphics.print("Range: " .. gamestate.range, viewport.size - 100, viewport.size - 20)
 
+	for k, v in pairs(buttons) do
+		love.graphics.rectangle('line', v.x, v.y, v.width, 30)
+		love.graphics.print(v.label, v.x + 30, v.y + 10)
+	end
+
 	drawLogs()
 
 end
@@ -92,20 +109,31 @@ function love.update( dt )
 	track("Ship speed", myShip.speed .. " km/s")
 	if love.mouse.isDown(1) then
 		x, y = love.mouse.getPosition()
-		myShip:setDirection(math.deg(math.atan2(myShip:windowPositionY() - y, myShip:windowPositionX() - x)) - 90)
-		local dx = myShip:windowPositionX() - x
-		local dy = myShip:windowPositionY() - y
-		myShip:setSpeed(math.sqrt ( dx * dx + dy * dy ) * gamestate.range/1000)
-	end
-	
-	for k,v in pairs(objects) do
-		if (v.move) then
-			v:move(dt)
+		if x < viewport.size and y < viewport.size then
+			myShip:setDirection(math.deg(math.atan2(myShip:windowPositionY() - y, myShip:windowPositionX() - x)) - 90)
+			local dx = myShip:windowPositionX() - x
+			local dy = myShip:windowPositionY() - y
+			myShip:setSpeed(math.sqrt ( dx * dx + dy * dy ))
 		end
 	end
+	
 end
 
 function love.mousepressed(x, y, i)
+
+	if (i == 1) then
+		for k, v in pairs(buttons) do
+			if x > v.x and x < v.x + v.width and y > v.y and y < v.y + 30 then
+				log('you pressed ' .. v.label);
+				for k,v in pairs(objects) do
+					if (v.move) then
+						v:move(dt)
+					end
+				end
+			end
+		end
+	end
+
 	if (i == 2) then
 		logs = {}
 	end
