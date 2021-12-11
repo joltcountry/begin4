@@ -34,11 +34,13 @@ function drawLogs()
 
 end
 
+cycling = 0
+
 function love.load()
 log('loading')
 	love.window.setMode(1800,1400)
 	love.window.setTitle('Fuck Tom Nelson!  No, sorry, that was mean.')
-	gamestate = { scale = 1, range = 30000, ringSpacing = 5000 }
+	gamestate = { scale = 1, range = 30000, ringSpacing = 5000, cycles = 100 }
 	viewport = { x = 0, y = 0, size = 1400 }
 	objects = {}
 	
@@ -100,6 +102,9 @@ function love.draw()
 		love.graphics.print(v.label, v.x + 30, v.y + 10)
 	end
 
+	if (cycling > 0) then
+		love.graphics.print('Processing turn...', 650, 1300)
+	end
 	drawLogs()
 
 end
@@ -107,16 +112,25 @@ end
 function love.update( dt )
 
 	track("Ship speed", myShip.speed .. " km/s")
-	if love.mouse.isDown(1) then
-		x, y = love.mouse.getPosition()
-		if x < viewport.size and y < viewport.size then
-			myShip:setDirection(math.deg(math.atan2(myShip:windowPositionY() - y, myShip:windowPositionX() - x)) - 90)
-			local dx = myShip:windowPositionX() - x
-			local dy = myShip:windowPositionY() - y
-			myShip:setSpeed(math.sqrt ( dx * dx + dy * dy ))
+	if cycling == 0 then
+		if love.mouse.isDown(1) then
+			x, y = love.mouse.getPosition()
+			if x < viewport.size and y < viewport.size then
+				myShip:setDirection(math.deg(math.atan2(myShip:windowPositionY() - y, myShip:windowPositionX() - x)) - 90)
+				local dx = myShip:windowPositionX() - x
+				local dy = myShip:windowPositionY() - y
+				myShip:setSpeed(math.sqrt ( dx * dx + dy * dy ))
+			end
 		end
+	else
+		for k,v in pairs(objects) do
+			if (v.move) then
+				v:move(dt)
+			end
+		end
+		cycling = cycling - 1
 	end
-	
+
 end
 
 function love.mousepressed(x, y, i)
@@ -125,11 +139,7 @@ function love.mousepressed(x, y, i)
 		for k, v in pairs(buttons) do
 			if x > v.x and x < v.x + v.width and y > v.y and y < v.y + 30 then
 				log('you pressed ' .. v.label);
-				for k,v in pairs(objects) do
-					if (v.move) then
-						v:move(dt)
-					end
-				end
+				cycling = gamestate.cycles
 			end
 		end
 	end
