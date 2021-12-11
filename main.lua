@@ -19,7 +19,7 @@ function drawLogs()
 		pos = pos + 1
 	end
 	for i,v in ipairs(logs) do
-		love.graphics.print(v, gamestate.windowWidth - 300, i * 20)
+		love.graphics.print(v, gamestate.windowWidth - 300, pos * 20)
 		pos = pos + 1
 	end
 
@@ -38,9 +38,11 @@ log('loading')
 	gamestate.windowOriginY = -(gamestate.windowHeight / 2)
 
 	image = love.graphics.newImage( "ship.png" )
-	objects.myShip = Movable:new(0, 0, image, 90, 1000)
+	objects.myShip = Movable:new(0, 0, image)
 	myShip = objects.myShip -- convenience
 
+	enemyImage = love.graphics.newImage( "enemy.png" )
+	objects.enemy = Movable:new(-500, -200, enemyImage, 135, 500)
 	love.graphics.setBackgroundColor(.3,.3,.5);
 
 end
@@ -69,6 +71,7 @@ function love.draw()
 
 	love.graphics.setColor(1,1,1);
 	for k,v in pairs(objects) do
+		track(k, v.x .. '.' .. v.y)
 		v:draw()
 	end
 
