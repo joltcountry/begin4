@@ -51,6 +51,7 @@ function love.draw()
 
 	-- draw range rings
 	love.graphics.setColor(.9, .7, .8)
+
 	for ringDistance = gamestate.ringSpacing, gamestate.range, gamestate.ringSpacing do
 		local radius = ringDistance * maxDimension / gamestate.range / 2
 		love.graphics.print(ringDistance, myShip:windowPositionX() - 20, myShip:windowPositionY() - radius - 20)
@@ -58,9 +59,12 @@ function love.draw()
 	end
 
 	if love.mouse.isDown(1) then
+		love.graphics.setLineWidth(3)
 		x, y = love.mouse.getPosition()
 		love.graphics.setColor(.9, .2, .2)
 		love.graphics.line(x, y, myShip:windowPositionX(), myShip:windowPositionY())
+		love.graphics.circle('fill', x, y, 10);
+		love.graphics.setLineWidth(1)
 	end
 
 	love.graphics.setColor(1,1,1);
