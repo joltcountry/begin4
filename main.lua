@@ -38,7 +38,7 @@ log('loading')
 	gamestate.windowOriginY = -(gamestate.windowHeight / 2)
 
 	image = love.graphics.newImage( "ship.png" )
-	objects.myShip = Movable:new(0, 0, image, 190, 10)
+	objects.myShip = Movable:new(0, 0, image, 90, 1000)
 	myShip = objects.myShip -- convenience
 
 	love.graphics.setBackgroundColor(.3,.3,.5);
@@ -82,7 +82,7 @@ function love.update( dt )
 		myShip:setDirection(math.deg(math.atan2(myShip:windowPositionY() - y, myShip:windowPositionX() - x)) - 90)
 		local dx = myShip:windowPositionX() - x
 		local dy = myShip:windowPositionY() - y
-		myShip:setSpeed(math.sqrt ( dx * dx + dy * dy ))
+		myShip:setSpeed(math.sqrt ( dx * dx + dy * dy ) * gamestate.range/1000)
 	end
 	
 	for k,v in pairs(objects) do
