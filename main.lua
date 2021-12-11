@@ -1,9 +1,28 @@
 require 'objects'
 
 logs = {}
-
+trackers = {}
 function log(s)
 	table.insert(logs, s)
+end
+
+function track(k, s)
+	trackers[k] = s 
+end
+
+function drawLogs()
+
+	love.graphics.setColor(.5, .5, 1);
+	local pos = 0
+	for k,v in pairs(trackers) do
+		love.graphics.print(k .. ': ' .. v, gamestate.windowWidth - 300, pos * 20)
+		pos = pos + 1
+	end
+	for i,v in ipairs(logs) do
+		love.graphics.print(v, gamestate.windowWidth - 300, i * 20)
+		pos = pos + 1
+	end
+
 end
 
 function love.load()
@@ -51,15 +70,13 @@ function love.draw()
 
 	love.graphics.print("Range: " .. gamestate.range, 1400, 1180)
 
-	love.graphics.setColor(.5, .5, 1);
-	for i,v in ipairs(logs) do
-		love.graphics.print(v, gamestate.windowWidth - 200, i * 20)
-	end
+	drawLogs()
 
 end
 
 function love.update( dt )
 
+	track("Ship speed", myShip.speed .. " km/s")
 	if love.mouse.isDown(1) then
 		x, y = love.mouse.getPosition()
 		myShip:setDirection(math.deg(math.atan2(myShip:windowPositionY() - y, myShip:windowPositionX() - x)) - 90)
