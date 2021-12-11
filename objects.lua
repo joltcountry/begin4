@@ -15,14 +15,18 @@ function ObjectInSpace:draw()
 end
 
 function ObjectInSpace:windowPositionX()
-    return gamestate.windowOriginX + viewport.size + self.x
+    local unit = viewport.size / gamestate.range
+    local xOffset = self.x - viewport.centerX
+
+    return viewport.x + viewport.size/2 + (xOffset * unit)
 end
 
 function ObjectInSpace:windowPositionY()
-    return gamestate.windowOriginY + viewport.size + self.y 
+    local unit = viewport.size / gamestate.range
+    local yOffset = self.y - viewport.centerY
+
+    return viewport.y + viewport.size/2 + (yOffset * unit)
 end
-
-
 
 Movable = ObjectInSpace:new()
 
@@ -48,6 +52,6 @@ function Movable:setSpeed(s)
 end
 
 function Movable:move(dt)
-    self.x = self.x + (math.sin(math.rad(self.dir)) * (self.speed * (viewport.size / gamestate.range)) * (1 / gamestate.cycles) / 2)
-    self.y = self.y - (math.cos(math.rad(self.dir)) * (self.speed * (viewport.size / gamestate.range)) * (1 / gamestate.cycles) / 2)
+    self.x = self.x + (math.sin(math.rad(self.dir)) * self.speed * (1 / gamestate.cycles))
+    self.y = self.y - (math.cos(math.rad(self.dir)) * self.speed * (1 / gamestate.cycles))
 end

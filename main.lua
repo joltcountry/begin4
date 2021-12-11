@@ -21,7 +21,7 @@ end
 
 function drawLogs()
 
-	love.graphics.setColor(.5, 1, .5);
+	love.graphics.setColor(.3, .3, .9);
 	local pos = 0
 	for k,v in pairs(trackers) do
 		love.graphics.print(k .. ': ' .. v, viewport.size + 10, pos * 20)
@@ -40,8 +40,8 @@ function love.load()
 log('loading')
 	love.window.setMode(1800,1400)
 	love.window.setTitle('Fuck Tom Nelson!  No, sorry, that was mean.')
-	gamestate = { scale = 1, range = 30000, ringSpacing = 5000, cycles = 100 }
-	viewport = { x = 0, y = 0, size = 1400 }
+	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 100 }
+	viewport = { x = 0, y = 0, size = 1400, centerX = 0, centerY = 0 }
 	objects = {}
 	
 	gamestate.windowWidth = love.graphics.getWidth()
@@ -54,22 +54,23 @@ log('loading')
 	myShip = objects.myShip -- convenience
 
 	enemyImage = love.graphics.newImage( "enemy.png" )
-	objects.enemy = Movable:new(-500, -200, enemyImage, 135, 500)
+	objects.enemy = Movable:new(-10000, -5000, enemyImage, 135, 500)
+
+	background = love.graphics.newImage('stars.jpg')
 
 end
 
 function love.draw()
 
-	love.graphics.setColor(.3, .3, .5)
-	love.graphics.rectangle("fill", viewport.x, viewport.y, viewport.size, viewport.size);
-
 	local maxDimension = viewport.size
 
 	love.graphics.setScissor(viewport.x, viewport.y, viewport.size, viewport.size)
+	love.graphics.setColor(.3, .3, .3)
+	love.graphics.draw(background, 0, 0);
 	-- draw range rings
-	love.graphics.setColor(.9, .7, .8)
+	love.graphics.setColor(.4, .3, .4)
 
-	for ringDistance = gamestate.ringSpacing, gamestate.range, gamestate.ringSpacing do
+	for ringDistance = gamestate.ringSpacing, gamestate.range * 2, gamestate.ringSpacing do
 		local radius = ringDistance * maxDimension / gamestate.range / 2
 		love.graphics.print(ringDistance, myShip:windowPositionX() - 20, myShip:windowPositionY() - radius - 20)
 		love.graphics.circle('line', myShip:windowPositionX(), myShip:windowPositionY(), radius)
@@ -131,6 +132,15 @@ function love.update( dt )
 		cycling = cycling - 1
 	end
 
+	objects.enemy:setDirection(math.deg(math.atan2(objects.enemy:windowPositionY() - myShip:windowPositionY(), objects.enemy:windowPositionX() - myShip:windowPositionX())) - 90)
+
+end
+
+function love.mousemoved(x, y, dx, dy, istouch )
+    if (love.mouse.isDown(3)) then
+        viewport.centerX = viewport.centerX - dx * 10
+        viewport.centerY = viewport.centerY - dy * 10
+    end
 end
 
 function love.mousepressed(x, y, i)
@@ -153,6 +163,7 @@ function love.wheelmoved(x, y)
 	log("Wheel moved: " .. y)
 	if (y > 0 and gamestate.range > 1000) or (y < 0 and gamestate.range < 100000) then
 		gamestate.range = gamestate.range - (y * 1000)
+		gamestate.scale = gamestate.scale + (y * (gamestate.scale * .02))
 	end
 end
 
