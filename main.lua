@@ -27,7 +27,7 @@ end
 
 function love.load()
 log('loading')
-	love.window.setMode(1500,1200)
+	love.window.setMode(1800,1500)
 	love.window.setTitle('Fuck Tom Nelson!  No, sorry, that was mean.')
 	gamestate = { scale = 1, range = 30000, ringSpacing = 5000 }
 	objects = {}
@@ -75,7 +75,7 @@ function love.draw()
 		v:draw()
 	end
 
-	love.graphics.print("Range: " .. gamestate.range, 1400, 1180)
+	love.graphics.print("Range: " .. gamestate.range, gamestate.windowWidth - 100, gamestate.windowHeight - 20)
 
 	drawLogs()
 
