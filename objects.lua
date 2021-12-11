@@ -15,11 +15,11 @@ function ObjectInSpace:draw()
 end
 
 function ObjectInSpace:windowPositionX()
-    return gamestate.windowOriginX + gamestate.windowWidth + self.x
+    return gamestate.windowOriginX + viewport.size + self.x
 end
 
 function ObjectInSpace:windowPositionY()
-    return gamestate.windowOriginY + gamestate.windowHeight + self.y 
+    return gamestate.windowOriginY + viewport.size + self.y 
 end
 
 
@@ -48,7 +48,6 @@ function Movable:setSpeed(s)
 end
 
 function Movable:move(dt)
-    local maxDimension = math.max(gamestate.windowWidth, gamestate.windowHeight)
-    self.x = self.x + (math.sin(math.rad(self.dir)) * (self.speed * (maxDimension / gamestate.range)) * dt / 2)
-    self.y = self.y - (math.cos(math.rad(self.dir)) * (self.speed * (maxDimension / gamestate.range)) * dt / 2)
+    self.x = self.x + (math.sin(math.rad(self.dir)) * (self.speed * (viewport.size / gamestate.range)) * dt / 2)
+    self.y = self.y - (math.cos(math.rad(self.dir)) * (self.speed * (viewport.size / gamestate.range)) * dt / 2)
 end

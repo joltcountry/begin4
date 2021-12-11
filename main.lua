@@ -12,14 +12,14 @@ end
 
 function drawLogs()
 
-	love.graphics.setColor(.5, .5, 1);
+	love.graphics.setColor(.5, 1, .5);
 	local pos = 0
 	for k,v in pairs(trackers) do
-		love.graphics.print(k .. ': ' .. v, gamestate.windowWidth - 300, pos * 20)
+		love.graphics.print(k .. ': ' .. v, viewport.size + 10, pos * 20)
 		pos = pos + 1
 	end
 	for i,v in ipairs(logs) do
-		love.graphics.print(v, gamestate.windowWidth - 300, pos * 20)
+		love.graphics.print(v, viewport.size + 10, pos * 20)
 		pos = pos + 1
 	end
 
@@ -30,12 +30,13 @@ log('loading')
 	love.window.setMode(1800,1500)
 	love.window.setTitle('Fuck Tom Nelson!  No, sorry, that was mean.')
 	gamestate = { scale = 1, range = 30000, ringSpacing = 5000 }
+	viewport = { x = 0, y = 0, size = 1400 }
 	objects = {}
-
+	
 	gamestate.windowWidth = love.graphics.getWidth()
 	gamestate.windowHeight = love.graphics.getHeight()
-	gamestate.windowOriginX = -(gamestate.windowWidth / 2)
-	gamestate.windowOriginY = -(gamestate.windowHeight / 2)
+	gamestate.windowOriginX = -(viewport.size / 2)
+	gamestate.windowOriginY = -(viewport.size / 2)
 
 	image = love.graphics.newImage( "ship.png" )
 	objects.myShip = Movable:new(0, 0, image)
@@ -43,14 +44,17 @@ log('loading')
 
 	enemyImage = love.graphics.newImage( "enemy.png" )
 	objects.enemy = Movable:new(-500, -200, enemyImage, 135, 500)
-	love.graphics.setBackgroundColor(.3,.3,.5);
 
 end
 
 function love.draw()
 
-	local maxDimension = math.max(gamestate.windowWidth, gamestate.windowHeight)
+	love.graphics.setColor(.3, .3, .5)
+	love.graphics.rectangle("fill", viewport.x, viewport.y, viewport.size, viewport.size);
 
+	local maxDimension = viewport.size
+
+	love.graphics.setScissor(viewport.x, viewport.y, viewport.size, viewport.size)
 	-- draw range rings
 	love.graphics.setColor(.9, .7, .8)
 
@@ -75,7 +79,9 @@ function love.draw()
 		v:draw()
 	end
 
-	love.graphics.print("Range: " .. gamestate.range, gamestate.windowWidth - 100, gamestate.windowHeight - 20)
+	love.graphics.setScissor()
+
+	love.graphics.print("Range: " .. gamestate.range, viewport.size - 100, viewport.size - 20)
 
 	drawLogs()
 
