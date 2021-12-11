@@ -66,7 +66,7 @@ function love.draw()
 
 	love.graphics.setScissor(viewport.x, viewport.y, viewport.size, viewport.size)
 	love.graphics.setColor(.3, .3, .3)
-	love.graphics.draw(background, 0, 0);
+	love.graphics.draw(background, -1500 - (viewport.centerX/200), -1000 - (viewport.centerY/200));
 	-- draw range rings
 	love.graphics.setColor(.4, .3, .4)
 
