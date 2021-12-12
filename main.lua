@@ -61,8 +61,9 @@ function love.draw()
 	love.graphics.setColor(.3, .3, .3)
 	love.graphics.draw(background, -1500 - (viewport.centerX/200), -1000 - (viewport.centerY/200));
 	-- draw range rings
+	love.graphics.setLineWidth(2)
 
-	for ringDistance = gamestate.ringSpacing, gamestate.range * 2, gamestate.ringSpacing do
+	for ringDistance = gamestate.ringSpacing, 100000, gamestate.ringSpacing do
 		local radius = ringDistance * maxDimension / gamestate.range / 2
 		love.graphics.setColor(.3, .3, .4)
 		love.graphics.print(ringDistance, myShip:windowPositionX() - 20, myShip:windowPositionY() - radius - 20)
@@ -101,7 +102,7 @@ function love.draw()
 
 		end
 	end
-if myShip.targetDir then track("dirs are different?", tostring(myShip.targetDir ~= myShip.dir)) end
+
 	if normalizeAngle(myShip.targetDir) ~= normalizeAngle(myShip.dir) then
 		local radius = lastRadius
 		local startAngle = myShip.dir
@@ -134,7 +135,7 @@ if myShip.targetDir then track("dirs are different?", tostring(myShip.targetDir 
 	love.graphics.setColor(1,1,1);
 	love.graphics.print("Turn " .. gamestate.turn, 690, 10)
 
-	love.graphics.print("Range: " .. gamestate.range, viewport.size - 100, viewport.size - 20)
+	love.graphics.print("Zoom: " .. math.floor(gamestate.range) .. 'km', viewport.size - 100, viewport.size - 20)
 
 	for k, v in pairs(buttons) do
 		love.graphics.rectangle('line', v.x, v.y, v.width, 30)
@@ -160,6 +161,7 @@ function love.update( dt )
 	end
 
 	track("Ship speed", myShip.speed .. " km/s")
+	track("Ship heading", myShip.dir)
 	track("Enemies", gamestate.enemies)
 
 	if cycling == 0 and love.mouse.isDown(2) then

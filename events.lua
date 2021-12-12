@@ -1,7 +1,7 @@
 function love.mousemoved(x, y, dx, dy, istouch )
     if (love.mouse.isDown(3)) then
-        viewport.centerX = viewport.centerX - dx * 10
-        viewport.centerY = viewport.centerY - dy * 10
+        viewport.centerX = viewport.centerX - dx * (gamestate.range / 1000)
+        viewport.centerY = viewport.centerY - dy * (gamestate.range / 1000)
     end
 end
 
@@ -17,7 +17,7 @@ function love.mousepressed(x, y, i)
 			end
 			if (x < viewport.size and y < viewport.size) then
 				local spread = 10
-				local volley = 1
+				local volley = 3
 				local direction = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
 				local start = direction
 				local spacing = 0
@@ -62,7 +62,7 @@ end
 function love.wheelmoved(x, y)
 	log("Wheel moved: " .. y)
 	if (y > 0 and gamestate.range > 1000) or (y < 0 and gamestate.range < 100000) then
-		gamestate.range = gamestate.range - (y * 1000)
+		gamestate.range = gamestate.range - (y * 1000 * gamestate.range / 10000)
 		gamestate.scale = gamestate.scale + (y * (gamestate.scale * .02))
 	end
 end

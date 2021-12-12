@@ -30,10 +30,8 @@ function cycle()
 
     if myShip.dir ~= myShip.targetDir then
         if diff > 0 then
-            log('mydir is less than target')
             myShip.dir = myShip.dir + math.min(diff, 20/gamestate.cycles)
         else
-            log('mydir is more than target')
             myShip.dir = myShip.dir - math.min(math.abs(diff), 20/gamestate.cycles)
         end
     end
