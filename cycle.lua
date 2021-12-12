@@ -1,12 +1,3 @@
-function normalizeAngle(a)
-    repeat
-        if a < 0 then
-            a = a + 360
-        end
-    until a >= 0
-    return math.floor(a)
-end
-
 function cycle() 
     for k,v in pairs(objects) do
         if (v.move) then

@@ -1,3 +1,12 @@
+function normalizeAngle(a)
+    repeat
+        if a < 0 then
+            a = a + 360
+        end
+    until a >= 0
+    return math.floor(a)
+end
+
 function printTable(t)
     for k,v in pairs(t) do
         print(k..'..'..v)
