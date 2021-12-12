@@ -44,9 +44,12 @@ function love.load()
 	myShip.targetDir = myShip.dir
 	myShip.targetSpeed = myShip.speed
 
+	myShip.shields = { 10, 100, 0, 50, 100, 100 }
+	myShip.shieldsRaised = true
+
 	enemyImage = love.graphics.newImage( "enemy.png" )
 	for i=1, gamestate.enemies do
-		objects['enemy' .. i] = Movable:new(math.random() * 50000 - 25000, math.random() * 50000 - 25000, enemyImage, 0, 1000)
+		objects['enemy' .. i] = Movable:new(math.random() * 100000 - 50000, math.random() * 100000 - 50000, enemyImage, 0, 1000)
 	end
 
 	background = love.graphics.newImage('stars.jpg')
@@ -88,7 +91,7 @@ function love.draw()
 			end
 
 			love.graphics.setLineWidth(2)
-			love.graphics.arc('line', myShip:windowPositionX(), myShip:windowPositionY(), radius, math.rad(startAngle - 90), math.rad(endAngle - 90))
+			love.graphics.arc('line', myShip:windowPositionX(), myShip:windowPositionY(), radius, getRad(startAngle), getRad(endAngle))
 			love.graphics.setColor(.2, .9, .4)
 			love.graphics.line(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
 			love.graphics.circle('fill', x, y, 10)
@@ -119,16 +122,31 @@ function love.draw()
 
 		love.graphics.setLineWidth(2)
 		love.graphics.setColor(.2, .1, .0)
-		love.graphics.arc('line', myShip:windowPositionX(), myShip:windowPositionY(), radius, math.rad(startAngle - 90), math.rad(endAngle - 90))
+		love.graphics.arc('line', myShip:windowPositionX(), myShip:windowPositionY(), radius, getRad(startAngle), getRad(endAngle))
 		love.graphics.setColor(.05, .2, .1)
 		love.graphics.line(myShip:windowPositionX(), myShip:windowPositionY(), newX, newY)
 		love.graphics.circle('fill', newX, newY, 10)
 	end
 
 	love.graphics.setColor(1,1,1);
+	
 	for k,v in pairs(objects) do
 		v:draw()
 	end
+
+	-- Draw shields
+
+	if (myShip.shieldsRaised) then
+		for shield, strength in ipairs(myShip.shields) do
+			local arcStart = myShip.dir + ((shield-1) * 60) - 25;
+			local arcEnd = myShip.dir + ((shield-1) * 60) + 25;
+			if (strength > 0) then
+				love.graphics.setColor(1 - 1 * strength/100,1 * strength/100 ,0)
+				drawArc(myShip:windowPositionX(), myShip:windowPositionY(), 50 * gamestate.scale * .75, arcStart, arcEnd)
+			end
+		end
+	end
+	-----
 
 	love.graphics.setScissor()
 
@@ -147,6 +165,8 @@ function love.draw()
 	end
 	drawLogs()
 
+	love.graphics.setColor(.6, .6, .6)
+	love.graphics.print("LMB: shoot, RMB: navigate, MMB: drag map, Wheel: zoom, Space: next turn, q: quit, `: reset logs", 20, 1350);
 	if (gamestate.enemies == 0) then
 		love.graphics.setColor(math.random(), math.random(), math.random())
 		love.graphics.print("YOU WON DA GAME!", 650 + math.random() * 100 - 50, 700 + math.random() * 100 - 50);

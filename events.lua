@@ -26,7 +26,6 @@ function love.mousepressed(x, y, i)
 					start = start - (spread / 2)
 				end
 				for i=0,volley-1 do
-					log(spacing)
 					local torpedo = Torpedo:new(myShip.x, myShip.y, nil, start + i * spacing, 8000)
 					table.insert(objects, torpedo)
 				end
@@ -60,7 +59,6 @@ function love.keypressed(key)
 end
 
 function love.wheelmoved(x, y)
-	log("Wheel moved: " .. y)
 	if (y > 0 and gamestate.range > 1000) or (y < 0 and gamestate.range < 100000) then
 		gamestate.range = gamestate.range - (y * 1000 * gamestate.range / 10000)
 		gamestate.scale = gamestate.scale + (y * (gamestate.scale * .02))
