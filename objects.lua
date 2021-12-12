@@ -1,11 +1,3 @@
-function remove(o)
-    for k,v in pairs(objects) do
-        if v == o then
-            objects[k] = nil
-        end
-    end
-end
-
 ObjectInSpace = {}
 
 function ObjectInSpace:new(x, y, drawer)
@@ -89,7 +81,6 @@ function Torpedo:turn()
     else
         self.turns = self.turns + 1
         if self.turns == 10 then
-            log("removing torpedo")
             remove(self)
         end
     end
@@ -99,12 +90,14 @@ function Torpedo:draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.circle('fill', self:windowPositionX(), self:windowPositionY(), 10 * (gamestate.scale * .5));
     love.graphics.setLineWidth(2);
-    love.graphics.setColor(math.random(), math.random(), math.random())
-    local dir = math.floor(math.random() * 360)
-    local distance = (math.floor(math.random() * 50) + 10) * (gamestate.scale * .75)
-    local endX = self:windowPositionX() + (math.sin(math.rad(dir)) * distance)
-    local endY = self:windowPositionY() - (math.cos(math.rad(dir)) * distance)
-    love.graphics.line(self:windowPositionX(), self:windowPositionY(), endX, endY)
+    for i=1,5 do
+        love.graphics.setColor(math.random(), math.random(), math.random())
+        local dir = math.floor(math.random() * 360)
+        local distance = (math.floor(math.random() * 20) + 10) * (gamestate.scale * .75)
+        local endX = self:windowPositionX() + (math.sin(math.rad(dir)) * distance)
+        local endY = self:windowPositionY() - (math.cos(math.rad(dir)) * distance)
+        love.graphics.line(self:windowPositionX(), self:windowPositionY(), endX, endY)
+    end
 end
 
 function Torpedo:update()
@@ -112,7 +105,6 @@ function Torpedo:update()
     for k,v in pairs(objects) do
         if string.find(k, 'enemy') then
             if math.abs(v.x - self.x) < hitbox and math.abs(v.y - self.y) < hitbox then
-                log('hit '..k)
                 table.insert(objects, Explosion:new(v.x, v.y))
                 remove(v)
                 remove(self)
