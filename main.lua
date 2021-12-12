@@ -11,6 +11,10 @@ buttons = {
 	}
 }
 
+function getDir(sourceX, sourceY, targetX, targetY)
+	return math.deg(math.atan2(sourceY - targetY, sourceX - targetX)) - 90
+end
+
 function log(s)
 	table.insert(logs, s)
 end
@@ -34,13 +38,25 @@ function drawLogs()
 
 end
 
+function takeTurn()
+	if cycling == 0 then
+		for k,v in pairs(objects) do
+			v:turn()
+		end
+		cycling = gamestate.cycles
+		gamestate.turn = gamestate.turn + 1
+	end
+end
+
 cycling = 0
 
+math.randomseed(os.time())
+
 function love.load()
-log('loading')
+
 	love.window.setMode(1800,1400)
 	love.window.setTitle('Fuck Tom Nelson!  No, sorry, that was mean.')
-	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 100 }
+	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 100, turn = 1, enemies = 10 }
 	viewport = { x = 0, y = 0, size = 1400, centerX = 0, centerY = 0 }
 	objects = {}
 	
@@ -52,9 +68,12 @@ log('loading')
 	image = love.graphics.newImage( "ship.png" )
 	objects.myShip = Movable:new(0, 0, image)
 	myShip = objects.myShip -- convenience
+	log(type(image))
 
 	enemyImage = love.graphics.newImage( "enemy.png" )
-	objects.enemy = Movable:new(-10000, -5000, enemyImage, 135, 500)
+	for i=1, gamestate.enemies do
+		objects['enemy' .. i] = Movable:new(math.random() * 50000 - 25000, math.random() * 50000 - 25000, enemyImage, 135, 500)
+	end
 
 	background = love.graphics.newImage('stars.jpg')
 
@@ -68,15 +87,16 @@ function love.draw()
 	love.graphics.setColor(.3, .3, .3)
 	love.graphics.draw(background, -1500 - (viewport.centerX/200), -1000 - (viewport.centerY/200));
 	-- draw range rings
-	love.graphics.setColor(.4, .3, .4)
 
 	for ringDistance = gamestate.ringSpacing, gamestate.range * 2, gamestate.ringSpacing do
 		local radius = ringDistance * maxDimension / gamestate.range / 2
+		love.graphics.setColor(.3, .3, .4)
 		love.graphics.print(ringDistance, myShip:windowPositionX() - 20, myShip:windowPositionY() - radius - 20)
+		love.graphics.setColor(.1, .1, .2)
 		love.graphics.circle('line', myShip:windowPositionX(), myShip:windowPositionY(), radius)
 	end
 
-	if love.mouse.isDown(1) then
+	if cycling == 0 and love.mouse.isDown(2) then
 		x, y = love.mouse.getPosition()
 		if x < viewport.size and y < viewport.size then
 			love.graphics.setLineWidth(3)
@@ -96,6 +116,9 @@ function love.draw()
 
 	love.graphics.setScissor()
 
+	love.graphics.setColor(1,1,1);
+	love.graphics.print("Turn " .. gamestate.turn, 690, 10)
+
 	love.graphics.print("Range: " .. gamestate.range, viewport.size - 100, viewport.size - 20)
 
 	for k, v in pairs(buttons) do
@@ -108,16 +131,22 @@ function love.draw()
 	end
 	drawLogs()
 
+	if (gamestate.enemies == 0) then
+		love.graphics.setColor(math.random(), math.random(), math.random())
+		love.graphics.print("YOU WON DA GAME!", 650 + math.random() * 100 - 50, 700 + math.random() * 100 - 50);
+	end
+
 end
 
 function love.update( dt )
 
 	track("Ship speed", myShip.speed .. " km/s")
+	track("Enemies", gamestate.enemies)
 	if cycling == 0 then
-		if love.mouse.isDown(1) then
+		if love.mouse.isDown(2) then
 			x, y = love.mouse.getPosition()
 			if x < viewport.size and y < viewport.size then
-				myShip:setDirection(math.deg(math.atan2(myShip:windowPositionY() - y, myShip:windowPositionX() - x)) - 90)
+				myShip:setDirection(getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y));
 				local dx = myShip:windowPositionX() - x
 				local dy = myShip:windowPositionY() - y
 				myShip:setSpeed(math.sqrt ( dx * dx + dy * dy ))
@@ -132,7 +161,15 @@ function love.update( dt )
 		cycling = cycling - 1
 	end
 
-	objects.enemy:setDirection(math.deg(math.atan2(objects.enemy:windowPositionY() - myShip:windowPositionY(), objects.enemy:windowPositionX() - myShip:windowPositionX())) - 90)
+	for k,v in pairs(objects) do
+		v:update(dt)
+	end
+
+	for k,v in pairs(objects) do
+		if string.find(k, "enemy") then
+			v:setDirection(math.deg(math.atan2(v:windowPositionY() - myShip:windowPositionY(), v:windowPositionX() - myShip:windowPositionX())) - 90)
+		end
+	end
 
 end
 
@@ -145,17 +182,43 @@ end
 
 function love.mousepressed(x, y, i)
 
-	if (i == 1) then
-		for k, v in pairs(buttons) do
-			if x > v.x and x < v.x + v.width and y > v.y and y < v.y + 30 then
-				log('you pressed ' .. v.label);
-				cycling = gamestate.cycles
+	if cycling == 0 then
+		if (i == 1) then
+			for k, v in pairs(buttons) do
+				if x > v.x and x < v.x + v.width and y > v.y and y < v.y + 30 then
+					takeTurn()
+					goto done
+				end
+			end
+			if (x < viewport.size and y < viewport.size) then
+				local spread = 10
+				local volley = 1
+				local direction = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
+				local start = direction
+				local spacing = 0
+				if (volley > 1) then
+					spacing = spread / (volley - 1)
+					start = start - (spread / 2)
+				end
+				for i=0,volley-1 do
+					log(spacing)
+					local torpedo = Torpedo:new(myShip.x, myShip.y, nil, start + i * spacing, 8000)
+					table.insert(objects, torpedo)
+				end
+				takeTurn()
 			end
 		end
 	end
+	:: done ::
+end
 
-	if (i == 2) then
+function love.keypressed(key)
+	if key == '`' then
 		logs = {}
+	elseif key == 'q' then
+		os.exit()
+	elseif key == 'space' then
+		takeTurn()
 	end
 end
 
