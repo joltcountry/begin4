@@ -1,4 +1,4 @@
-function cycle() 
+function cycle(dt)
     for k,v in pairs(objects) do
         if (v.move) then
             v:move(dt)

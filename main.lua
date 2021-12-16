@@ -25,11 +25,12 @@ end
 function love.load()
 
 	cycling = 0
+	t = 0
 	math.randomseed(os.time())
 
 	love.window.setMode(1800,1400)
 	love.window.setTitle('Fuck Tom Nelson!  No, sorry, that was mean.')
-	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 100, turn = 1, enemies = 10 }
+	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 20, turn = 1, enemies = 10 }
 	viewport = { x = 0, y = 0, size = 1400, centerX = 0, centerY = 0 }
 	objects = {}
 	
@@ -176,8 +177,11 @@ end
 
 function love.update( dt )
 
-	if (cycling > 0) then
+	t = t + dt
+
+	if (cycling > 0 and t > 1 / gamestate.cycles) then
 		cycle()
+		t = 0
 	end
 
 	track("Ship speed", myShip.speed .. " km/s")

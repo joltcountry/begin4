@@ -26,7 +26,7 @@ function love.mousepressed(x, y, i)
 					start = start - (spread / 2)
 				end
 				for i=0,volley-1 do
-					local torpedo = Torpedo:new(myShip.x, myShip.y, nil, start + i * spacing, 8000)
+					local torpedo = Torpedo:new(myShip.x, myShip.y, nil, start + i * spacing, 3500)
 					table.insert(objects, torpedo)
 				end
 				takeTurn()
