@@ -49,6 +49,7 @@ function love.mousereleased( x, y, button, istouch, presses )
 end
 
 function love.keypressed(key)
+	log(key)
 	if key == '`' then
 		logs = {}
 	elseif key == 'q' then

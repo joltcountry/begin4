@@ -29,7 +29,7 @@ function love.load()
 	math.randomseed(os.time())
 
 	love.window.setMode(1800,1400)
-	love.window.setTitle('Fuck Tom Nelson!  No, sorry, that was mean.')
+	love.window.setTitle('Begin 4')
 	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 20, turn = 1, enemies = 10 }
 	viewport = { x = 0, y = 0, size = 1400, centerX = 0, centerY = 0 }
 	objects = {}
@@ -51,6 +51,8 @@ function love.load()
 	enemyImage = love.graphics.newImage( "enemy.png" )
 	for i=1, gamestate.enemies do
 		objects['enemy' .. i] = Movable:new(math.random() * 100000 - 50000, math.random() * 100000 - 50000, enemyImage, 0, 1000)
+		objects['enemy' .. i].shields = { 100, 100, 100, 100, 100, 100 }
+		objects['enemy' .. i].shieldsRaised = true
 	end
 
 	background = love.graphics.newImage('stars.jpg')
@@ -147,6 +149,22 @@ function love.draw()
 			end
 		end
 	end
+
+	if (love.keyboard.isDown('lalt')) then
+		for k,v in pairs(objects) do
+			if string.find(k, 'enemy') then
+				for shield, strength in ipairs(v.shields) do
+					local arcStart = v.dir + ((shield-1) * 60) - 25;
+					local arcEnd = v.dir + ((shield-1) * 60) + 25;
+					if (strength > 0) then
+						love.graphics.setColor(1 - 1 * strength/100,1 * strength/100 ,0)
+						drawArc(v:windowPositionX(), v:windowPositionY(), 50 * gamestate.scale * .75, arcStart, arcEnd)
+					end
+				end
+			end
+		end
+	end
+
 	-----
 
 	love.graphics.setScissor()
