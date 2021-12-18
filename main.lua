@@ -4,33 +4,14 @@ require 'logging'
 require 'events'
 require 'cycle'
 
-buttons = {
-	nextturn = {
-		x=1500,y=1300,
-		label = "End Turn",
-		width = 200
-	}
-}
-
-function takeTurn()
-	if cycling == 0 then
-		for k,v in pairs(objects) do
-			v:turn()
-		end
-		cycling = gamestate.cycles
-		gamestate.turn = gamestate.turn + 1
-	end
-end
-
 function love.load()
 
-	cycling = 0
 	t = 0
 	math.randomseed(os.time())
 
 	love.window.setMode(1800,1400)
 	love.window.setTitle('Begin 4')
-	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 20, turn = 1, enemies = 10 }
+	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 50, turn = 1, enemies = 3 }
 	viewport = { x = 0, y = 0, size = 1400, centerX = 0, centerY = 0 }
 	objects = {}
 	
@@ -45,14 +26,16 @@ function love.load()
 	myShip.targetDir = myShip.dir
 	myShip.targetSpeed = myShip.speed
 
-	myShip.shields = { 10, 100, 0, 50, 100, 100 }
+	myShip.shields = { 100, 100, 100, 100, 100, 100 }
 	myShip.shieldsRaised = true
 
 	enemyImage = love.graphics.newImage( "enemy.png" )
 	for i=1, gamestate.enemies do
-		objects['enemy' .. i] = Movable:new(math.random() * 100000 - 50000, math.random() * 100000 - 50000, enemyImage, 0, 1000)
+		objects['enemy' .. i] = Movable:new(math.random() * 40000 - 20000, math.random() * 40000 - 20000, enemyImage)
 		objects['enemy' .. i].shields = { 100, 100, 100, 100, 100, 100 }
 		objects['enemy' .. i].shieldsRaised = true
+		objects['enemy' .. i].dir = math.random(360)
+		objects['enemy' .. i].speed = math.random(1500) + 500
 	end
 
 	background = love.graphics.newImage('stars.jpg')
@@ -77,7 +60,7 @@ function love.draw()
 		love.graphics.circle('line', myShip:windowPositionX(), myShip:windowPositionY(), radius)
 	end
 
-	if cycling == 0 and love.mouse.isDown(2) then
+	if love.mouse.isDown(2) then
 		x, y = love.mouse.getPosition()
 		if x < viewport.size and y < viewport.size then
 			love.graphics.setLineWidth(3)
@@ -144,26 +127,26 @@ function love.draw()
 			local arcStart = myShip.dir + ((shield-1) * 60) - 25;
 			local arcEnd = myShip.dir + ((shield-1) * 60) + 25;
 			if (strength > 0) then
-				love.graphics.setColor(1 - 1 * strength/100,1 * strength/100 ,0)
-				drawArc(myShip:windowPositionX(), myShip:windowPositionY(), 50 * gamestate.scale * .75, arcStart, arcEnd)
+				love.graphics.setColor(1 - strength/100,strength/150 ,0)
+				drawArc(myShip:windowPositionX(), myShip:windowPositionY(), (30 * gamestate.scale) + (strength/100 * 15 * gamestate.scale), arcStart, arcEnd)
 			end
 		end
 	end
 
-	if (love.keyboard.isDown('lalt')) then
+--	if (love.keyboard.isDown('lalt')) then
 		for k,v in pairs(objects) do
 			if string.find(k, 'enemy') then
 				for shield, strength in ipairs(v.shields) do
 					local arcStart = v.dir + ((shield-1) * 60) - 25;
 					local arcEnd = v.dir + ((shield-1) * 60) + 25;
 					if (strength > 0) then
-						love.graphics.setColor(1 - 1 * strength/100,1 * strength/100 ,0)
-						drawArc(v:windowPositionX(), v:windowPositionY(), 50 * gamestate.scale * .75, arcStart, arcEnd)
+						love.graphics.setColor(1 - strength/100,strength/150 , 0)
+						drawArc(v:windowPositionX(), v:windowPositionY(), (30 * gamestate.scale) + (strength/100 * 15 * gamestate.scale), arcStart, arcEnd)
 					end
 				end
 			end
 		end
-	end
+--	end
 
 	-----
 
@@ -174,18 +157,10 @@ function love.draw()
 
 	love.graphics.print("Zoom: " .. math.floor(gamestate.range) .. 'km', viewport.size - 100, viewport.size - 20)
 
-	for k, v in pairs(buttons) do
-		love.graphics.rectangle('line', v.x, v.y, v.width, 30)
-		love.graphics.print(v.label, v.x + 30, v.y + 10)
-	end
-
-	if (cycling > 0) then
-		love.graphics.print('Processing turn...', 650, 1300)
-	end
 	drawLogs()
 
 	love.graphics.setColor(.6, .6, .6)
-	love.graphics.print("LMB: shoot, RMB: navigate, MMB: drag map, Wheel: zoom, Space: next turn, q: quit, `: reset logs", 20, 1350);
+	love.graphics.print("LMB: shoot, RMB: navigate, MMB: drag map, Wheel: zoom, Space: GO!, q: quit, `: reset logs", 20, 1350);
 	if (gamestate.enemies == 0) then
 		love.graphics.setColor(math.random(), math.random(), math.random())
 		love.graphics.print("YOU WON DA GAME!", 650 + math.random() * 100 - 50, 700 + math.random() * 100 - 50);
@@ -194,33 +169,27 @@ function love.draw()
 end
 
 function love.update( dt )
+    if not gamestate.dead then 
+		t = t + dt
 
-	t = t + dt
+		if (not love.keyboard.isDown('space') and t > 1 / gamestate.cycles) then
+			cycle()
+			t = 0
+		end
 
-	if (cycling > 0 and t > 1 / gamestate.cycles) then
-		cycle()
-		t = 0
-	end
+		track("Ship speed", myShip.speed .. " km/s")
+		track("Ship heading", myShip.dir)
+		track("Enemies", gamestate.enemies)
 
-	track("Ship speed", myShip.speed .. " km/s")
-	track("Ship heading", myShip.dir)
-	track("Enemies", gamestate.enemies)
+		if love.mouse.isDown(2) then
+			myShip.targetDir = myShip.dir
+			myShip.targetSpeed = myShip.speed
+		end
 
-	if cycling == 0 and love.mouse.isDown(2) then
-		myShip.targetDir = myShip.dir
-		myShip.targetSpeed = myShip.speed
-	end
-
-	for k,v in pairs(objects) do
-		v:update(dt)
-	end
-
-	for k,v in pairs(objects) do
-		if string.find(k, "enemy") then
-			v:setDirection(math.deg(math.atan2(v:windowPositionY() - myShip:windowPositionY(), v:windowPositionX() - myShip:windowPositionX())) - 90)
+		for k,v in pairs(objects) do
+			v:update(dt)
 		end
 	end
-
 end
 
 

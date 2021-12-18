@@ -102,13 +102,48 @@ end
 
 function Torpedo:update()
     local hitbox = 200
-    for k,v in pairs(objects) do
-        if string.find(k, 'enemy') then
-            if math.abs(v.x - self.x) < hitbox and math.abs(v.y - self.y) < hitbox then
-                table.insert(objects, Explosion:new(v.x, v.y))
-                remove(v)
-                remove(self)
-                gamestate.enemies = gamestate.enemies - 1
+    if self.myTorp then
+        for k,v in pairs(objects) do
+            if string.find(k, 'enemy') then
+                if math.abs(v.x - self.x) < hitbox and math.abs(v.y - self.y) < hitbox then
+                    local hitDir = normalizeAngle(getDir(v.x, v.y, self.x, self.y))
+                    local shieldHit = getShieldSide(v.dir, hitDir)
+                    local hitStrength = math.random(25) + 25
+                    log("Shield " .. shieldHit .. " HIT from angle " .. hitDir .. " for " .. hitStrength);
+                    v.shields[shieldHit] = v.shields[shieldHit] - hitStrength;
+                    remove(self)
+                    if (v.shields[shieldHit] <= 0) then
+                        table.insert(objects, Explosion:new(v.x, v.y))
+                        remove(v)
+                        gamestate.enemies = gamestate.enemies - 1
+                    else
+                        local littleExplosion = Explosion:new(v.x, v.y)
+                        littleExplosion.size = 20
+                        littleExplosion.seconds = .5
+                        table.insert(objects, littleExplosion)
+                    end
+                end
+            end
+        end
+    else 
+        if math.abs(myShip.x - self.x) < hitbox and math.abs(myShip.y - self.y) < hitbox then
+            local hitDir = normalizeAngle(getDir(myShip.x, myShip.y, self.x, self.y))
+            local shieldHit = getShieldSide(myShip.dir, hitDir)
+            local hitStrength = math.random(25) + 25
+            log("Shield " .. shieldHit .. " HIT from angle " .. hitDir .. " for " .. hitStrength);
+            myShip.shields[shieldHit] = myShip.shields[shieldHit] - hitStrength;
+            remove(self)
+            if (myShip.shields[shieldHit] <= 0) then
+                -- death
+                table.insert(objects, Explosion:new(myShip.x, myShip.y))
+                myShip.shields = {0, 0, 0, 0, 0, 0}
+                gamestate.dead = true
+                remove(myShip)
+            else
+                local littleExplosion = Explosion:new(myShip.x, myShip.y)
+                littleExplosion.size = 20
+                littleExplosion.seconds = .5
+                table.insert(objects, littleExplosion)
             end
         end
     end
@@ -117,16 +152,18 @@ end
 Explosion = ObjectInSpace:new()
 
 function Explosion:draw()
+    local size = self.size or 50
     love.graphics.setColor(math.random(), math.random(), math.random())
-    love.graphics.circle('fill', self:windowPositionX(), self:windowPositionY(), math.random() * 100 + 50);
+    love.graphics.circle('fill', self:windowPositionX(), self:windowPositionY(), math.random() * size * 2 + size);
 end
 
 function Explosion:update(dt)
+    local seconds = self.seconds or 1
     if not self.timer then
         self.timer = 0
     else
         self.timer = self.timer + dt
-        if self.timer > 1 then
+        if self.timer > seconds then
             remove(self)
         end
     end

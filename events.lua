@@ -7,45 +7,34 @@ end
 
 function love.mousepressed(x, y, i)
 
-	if cycling == 0 then
-		if (i == 1) then
-			for k, v in pairs(buttons) do
-				if x > v.x and x < v.x + v.width and y > v.y and y < v.y + 30 then
-					takeTurn()
-					goto done
-				end
+	if (i == 1) then
+		if (x < viewport.size and y < viewport.size) then
+			local spread = 10
+			local volley = 3
+			local direction = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
+			local start = direction
+			local spacing = 0
+			if (volley > 1) then
+				spacing = spread / (volley - 1)
+				start = start - (spread / 2)
 			end
-			if (x < viewport.size and y < viewport.size) then
-				local spread = 10
-				local volley = 3
-				local direction = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
-				local start = direction
-				local spacing = 0
-				if (volley > 1) then
-					spacing = spread / (volley - 1)
-					start = start - (spread / 2)
-				end
-				for i=0,volley-1 do
-					local torpedo = Torpedo:new(myShip.x, myShip.y, nil, start + i * spacing, 3500)
-					table.insert(objects, torpedo)
-				end
-				takeTurn()
+			for i=0,volley-1 do
+				local torpedo = Torpedo:new(myShip.x, myShip.y, nil, start + i * spacing, 5000)
+				table.insert(objects, torpedo)
 			end
 		end
-	end
+    end
 	:: done ::
 end
 
 function love.mousereleased( x, y, button, istouch, presses )
-    if cycling == 0 then
-        if button == 2 and x < viewport.size and y < viewport.size then
-            myShip.targetDir = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
-            myShip.targetSpeed = getDistance(myShip:windowPositionX(), myShip:windowPositionY(), x, y) * 2
-            lastClickedX = x
-            lastClickedY = y
-            lastRadius = getDistance(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
-        end
-    end
+	if button == 2 and x < viewport.size and y < viewport.size then
+		myShip.targetDir = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
+		myShip.targetSpeed = getDistance(myShip:windowPositionX(), myShip:windowPositionY(), x, y) * 2
+		lastClickedX = x
+		lastClickedY = y
+		lastRadius = getDistance(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
+	end
 end
 
 function love.keypressed(key)
@@ -54,8 +43,6 @@ function love.keypressed(key)
 		logs = {}
 	elseif key == 'q' then
 		os.exit()
-	elseif key == 'space' then
-		takeTurn()
 	end
 end
 
