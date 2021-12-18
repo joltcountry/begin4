@@ -128,7 +128,9 @@ function love.draw()
 --	if (love.keyboard.isDown('lalt')) then
 		for k,v in pairs(objects) do
 			if string.find(k, 'enemy') then
-				drawShields(v)
+				if v.shieldsRaised then
+					drawShields(v)
+				end
 			end
 		end
 --	end
@@ -138,7 +140,6 @@ function love.draw()
 	love.graphics.setScissor()
 
 	love.graphics.setColor(1,1,1);
-	love.graphics.print("Turn " .. gamestate.turn, 690, 10)
 
 	love.graphics.print("Zoom: " .. math.floor(gamestate.range) .. 'km', viewport.size - 100, viewport.size - 20)
 
