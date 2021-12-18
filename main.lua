@@ -159,7 +159,7 @@ function love.update( dt )
 	if not gamestate.dead then 
 		t = t + dt
 
-		if (love.keyboard.isDown('space') and t > 1 / gamestate.cycles) then
+		if (love.keyboard.isDown('space') and t > perCycle(1)) then
 			cycle()
 			t = 0
 		end

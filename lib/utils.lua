@@ -88,3 +88,7 @@ function drawShields(o)
         end
     end
 end
+
+function perCycle(n)
+    return n / gamestate.cycles
+end

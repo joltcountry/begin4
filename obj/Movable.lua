@@ -27,8 +27,8 @@ function Movable:setSpeed(s)
 end
 
 function Movable:move(dt)
-    self.x = self.x + (math.sin(math.rad(self.dir)) * self.speed * (1 / gamestate.cycles))
-    self.y = self.y - (math.cos(math.rad(self.dir)) * self.speed * (1 / gamestate.cycles))
+    self.x = self.x + (math.sin(math.rad(self.dir)) * self.speed * perCycle(1))
+    self.y = self.y - (math.cos(math.rad(self.dir)) * self.speed * perCycle(1))
 end
 
 function Movable:xVel()

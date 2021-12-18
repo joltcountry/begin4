@@ -7,9 +7,9 @@ function cycle(dt)
 
     if myShip.speed ~= myShip.targetSpeed then
         if myShip.speed < myShip.targetSpeed then
-            myShip.speed = math.min(myShip.targetSpeed, myShip.speed + 500/gamestate.cycles)
+            myShip.speed = math.min(myShip.targetSpeed, myShip.speed + perCycle(500))
         else
-            myShip.speed = math.max(myShip.targetSpeed, myShip.speed - 500/gamestate.cycles)
+            myShip.speed = math.max(myShip.targetSpeed, myShip.speed - perCycle(500))
         end
     end
 
@@ -21,9 +21,9 @@ function cycle(dt)
 
     if myShip.dir ~= myShip.targetDir then
         if diff > 0 then
-            myShip.dir = myShip.dir + math.min(diff, 20/gamestate.cycles)
+            myShip.dir = myShip.dir + math.min(diff, perCycle(20))
         else
-            myShip.dir = myShip.dir - math.min(math.abs(diff), 20/gamestate.cycles)
+            myShip.dir = myShip.dir - math.min(math.abs(diff), perCycle(20))
         end
     end
 
@@ -45,10 +45,12 @@ function cycle(dt)
 			else
 				if v.speed ~= v.targetSpeed then
 					if v.speed < v.targetSpeed then
-						v.speed = math.min(v.targetSpeed, v.speed + 500/gamestate.cycles)
+						v.speed = math.min(v.targetSpeed, v.speed + perCycle(500))
 					else
-						v.speed = math.max(v.targetSpeed, v.speed - 500/gamestate.cycles)
-					end
+						v.speed = math.max(v.targetSpeed, v.speed - perCycle(500))
+			
+				v.targetDir = math.random(360)
+				v.targetSpeed = math.random(1500) + 500		end
 				end
 			
 				currDir = normalizeAngle(v.dir)
@@ -57,13 +59,13 @@ function cycle(dt)
 				diff = targetDir - currDir
 				diff = (diff + 180) % 360 - 180
 			
-				if (math.abs(diff) < 20/gamestate.cycles) then
+				if (math.abs(diff) < perCycle(20)) then
 					v.dir = v.targetDir
 				else
 					if diff > 0 then
-						v.dir = v.dir + math.min(diff, 20/gamestate.cycles)
+						v.dir = v.dir + math.min(diff, perCycle(20))
 					else
-						v.dir = v.dir - math.min(math.abs(diff), 20/gamestate.cycles)
+						v.dir = v.dir - math.min(math.abs(diff), perCycle(20))
 					end
 				end
 			end
