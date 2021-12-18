@@ -32,9 +32,9 @@ function cycle(dt)
 
             -- fire?
             if (math.random(50) == 1) then
-
                 local dir = getDir(v.x, v.y, myShip.x, myShip.y)
                 local torpedo = Torpedo:new(v.x, v.y, nil, dir, 5000)
+				torpedo.shooter = v
 				table.insert(objects, torpedo)
             end
 

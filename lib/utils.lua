@@ -88,4 +88,3 @@ function drawShields(o)
         end
     end
 end
-    
