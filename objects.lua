@@ -102,7 +102,9 @@ end
 
 function Torpedo:update()
     local hitbox = 200
-    if self.myTorp then
+    --log('wtf is going on')
+    track("TORPEDO MYTORP is ", self['myTorp'])
+    if self['myTorp'] then
         for k,v in pairs(objects) do
             if string.find(k, 'enemy') then
                 if math.abs(v.x - self.x) < hitbox and math.abs(v.y - self.y) < hitbox then
@@ -130,7 +132,7 @@ function Torpedo:update()
             local hitDir = normalizeAngle(getDir(myShip.x, myShip.y, self.x, self.y))
             local shieldHit = getShieldSide(myShip.dir, hitDir)
             local hitStrength = math.random(25) + 25
-            log("Shield " .. shieldHit .. " HIT from angle " .. hitDir .. " for " .. hitStrength);
+            log("Shield " .. shieldHit .. " HIT from not my torp angle " .. hitDir .. " for " .. hitStrength);
             myShip.shields[shieldHit] = myShip.shields[shieldHit] - hitStrength;
             remove(self)
             if (myShip.shields[shieldHit] <= 0) then

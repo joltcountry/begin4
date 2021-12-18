@@ -20,6 +20,8 @@ function love.mousepressed(x, y, i)
 			end
 			for i=0,volley-1 do
 				local torpedo = Torpedo:new(myShip.x, myShip.y, nil, start + i * spacing, 5000)
+				torpedo['myTorp'] = true
+				track("torpedy mytorp is ", torpedo['myTorp'])
 				table.insert(objects, torpedo)
 			end
 		end
