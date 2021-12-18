@@ -77,4 +77,15 @@ function getVector(xVel, yVel)
     local dir = getDir(0, 0, xVel, yVel)
     return { dir, speed }    
 end
+
+function drawShields(o)
+    for shield, strength in ipairs(o.shields) do
+        local arcStart = o.dir + ((shield-1) * 60) - 25;
+        local arcEnd = o.dir + ((shield-1) * 60) + 25;
+        if (strength > 0) then
+            love.graphics.setColor(1 - strength/100,strength/150 , 0)
+            drawArc(o:windowPositionX(), o:windowPositionY(), (30 * gamestate.scale) + (strength/100 * 15 * gamestate.scale), arcStart, arcEnd)
+        end
+    end
+end
     

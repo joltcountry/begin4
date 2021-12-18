@@ -1,6 +1,6 @@
 require 'objects'
-require 'utils'
-require 'logging' 
+require 'lib.utils'
+require 'lib.logging' 
 require 'events'
 require 'cycle'
 
@@ -20,7 +20,7 @@ function love.load()
 	gamestate.windowOriginX = -(viewport.size / 2)
 	gamestate.windowOriginY = -(viewport.size / 2)
 
-	image = love.graphics.newImage( "ship.png" )
+	image = love.graphics.newImage( "img/ship.png" )
 	objects.myShip = Movable:new(0, 0, image)
 	myShip = objects.myShip -- convenience
 	myShip.targetDir = myShip.dir
@@ -29,16 +29,15 @@ function love.load()
 	myShip.shields = { 100, 100, 100, 100, 100, 100 }
 	myShip.shieldsRaised = true
 
-	enemyImage = love.graphics.newImage( "enemy.png" )
+	enemyImage = love.graphics.newImage( "img/enemy.png" )
 	for i=1, gamestate.enemies do
-		objects['enemy' .. i] = Movable:new(math.random() * 40000 - 20000, math.random() * 40000 - 20000, enemyImage)
-		objects['enemy' .. i].shields = { 100, 100, 100, 100, 100, 100 }
-		objects['enemy' .. i].shieldsRaised = true
-		objects['enemy' .. i].dir = math.random(360)
-		objects['enemy' .. i].speed = math.random(1500) + 500
+		local enemy = Movable:new(math.random() * 40000 - 20000, math.random() * 40000 - 20000, enemyImage, math.random(360), math.random(1500) + 500)
+		enemy.shields = { 100, 100, 100, 100, 100, 100 }
+		enemy.shieldsRaised = true
+		objects['enemy' .. i] = enemy
 	end
 
-	background = love.graphics.newImage('stars.jpg')
+	background = love.graphics.newImage('img/stars.jpg')
 
 end
 
@@ -47,7 +46,7 @@ function love.draw()
 	local maxDimension = viewport.size
 
 	love.graphics.setScissor(viewport.x, viewport.y, viewport.size, viewport.size)
-	love.graphics.setColor(.3, .3, .3)
+	love.graphics.setColor(.2, .2, .4)
 	love.graphics.draw(background, -1500 - (viewport.centerX/200), -1000 - (viewport.centerY/200));
 	-- draw range rings
 	love.graphics.setLineWidth(2)
@@ -123,27 +122,13 @@ function love.draw()
 	-- Draw shields
 
 	if (myShip.shieldsRaised) then
-		for shield, strength in ipairs(myShip.shields) do
-			local arcStart = myShip.dir + ((shield-1) * 60) - 25;
-			local arcEnd = myShip.dir + ((shield-1) * 60) + 25;
-			if (strength > 0) then
-				love.graphics.setColor(1 - strength/100,strength/150 ,0)
-				drawArc(myShip:windowPositionX(), myShip:windowPositionY(), (30 * gamestate.scale) + (strength/100 * 15 * gamestate.scale), arcStart, arcEnd)
-			end
-		end
+		drawShields(myShip)
 	end
 
 --	if (love.keyboard.isDown('lalt')) then
 		for k,v in pairs(objects) do
 			if string.find(k, 'enemy') then
-				for shield, strength in ipairs(v.shields) do
-					local arcStart = v.dir + ((shield-1) * 60) - 25;
-					local arcEnd = v.dir + ((shield-1) * 60) + 25;
-					if (strength > 0) then
-						love.graphics.setColor(1 - strength/100,strength/150 , 0)
-						drawArc(v:windowPositionX(), v:windowPositionY(), (30 * gamestate.scale) + (strength/100 * 15 * gamestate.scale), arcStart, arcEnd)
-					end
-				end
+				drawShields(v)
 			end
 		end
 --	end
