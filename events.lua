@@ -12,16 +12,18 @@ function love.mousepressed(x, y, i)
 			local spread = 10
 			local volley = 3
 			local direction = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
-			local start = direction
 			local spacing = 0
+			local xVel = getXVel(direction, 5000) + myShip:xVel();
+			local yVel = getYVel(direction, 5000) + myShip:yVel();
+			local vector = getVector(xVel, yVel);
+			local start = direction
 			if (volley > 1) then
 				spacing = spread / (volley - 1)
 				start = start - (spread / 2)
 			end
 			for i=0,volley-1 do
-				local torpedo = Torpedo:new(myShip.x, myShip.y, nil, start + i * spacing, 5000)
-				torpedo['myTorp'] = true
-				track("torpedy mytorp is ", torpedo['myTorp'])
+				local torpedo = Torpedo:new(myShip.x, myShip.y, nil, start + i * spacing, vector[2])
+				torpedo.myTorp = true
 				table.insert(objects, torpedo)
 			end
 		end

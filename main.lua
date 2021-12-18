@@ -169,7 +169,8 @@ function love.draw()
 end
 
 function love.update( dt )
-    if not gamestate.dead then 
+
+	if not gamestate.dead then 
 		t = t + dt
 
 		if (not love.keyboard.isDown('space') and t > 1 / gamestate.cycles) then

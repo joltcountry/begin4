@@ -63,3 +63,18 @@ function drawArc(centerX, centerY, radius, startAngle, endAngle)
         endY = endY
     end
 end
+
+function getXVel(dir, speed)
+    return math.sin(math.rad(dir)) * speed
+end
+
+function getYVel(dir, speed)
+    return -math.cos(math.rad(dir)) * speed
+end
+
+function getVector(xVel, yVel)
+    local speed = getDistance(0, 0, xVel, yVel)
+    local dir = getDir(0, 0, xVel, yVel)
+    return { dir, speed }    
+end
+    

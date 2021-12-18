@@ -72,7 +72,25 @@ function Movable:move(dt)
     self.y = self.y - (math.cos(math.rad(self.dir)) * self.speed * (1 / gamestate.cycles))
 end
 
+function Movable:xVel()
+    return math.sin(math.rad(self.dir)) * self.speed
+end
+
+function Movable:yVel()
+    return -math.cos(math.rad(self.dir)) * self.speed
+end
+
 Torpedo = Movable:new()
+
+function Torpedo:new(x, y, drawer, dir, speed, proximity)
+    o = Movable:new(x, y, drawer)
+    o.dir = dir or 0
+    o.speed = speed or 0
+    o.proximity = proximity or 300
+    self.__index = self
+    setmetatable(o, self)
+    return o
+end
 
 function Torpedo:turn()
     track("torpedo turns", self.turns)
@@ -100,53 +118,38 @@ function Torpedo:draw()
     end
 end
 
+function Torpedo:checkCollision(o)
+    if getDistance(o.x, o.y, self.x, self.y) < self.proximity then
+        local hitDir = normalizeAngle(getDir(o.x, o.y, self.x, self.y))
+        local shieldHit = getShieldSide(o.dir, hitDir)
+        local hitStrength = math.random(25) + 25
+        log("Shield " .. shieldHit .. " HIT from angle " .. hitDir .. " for " .. hitStrength);
+        o.shields[shieldHit] = o.shields[shieldHit] - hitStrength;
+        remove(self)
+        if (o.shields[shieldHit] <= 0) then
+            table.insert(objects, Explosion:new(o.x, o.y))
+            remove(o)
+            return true
+        else
+            local littleExplosion = Explosion:new(o.x, o.y)
+            littleExplosion.size = 20
+            littleExplosion.seconds = .5
+            table.insert(objects, littleExplosion)
+        end
+    end
+end
+
 function Torpedo:update()
-    local hitbox = 200
-    --log('wtf is going on')
-    track("TORPEDO MYTORP is ", self['myTorp'])
-    if self['myTorp'] then
+    if self.myTorp then
         for k,v in pairs(objects) do
-            if string.find(k, 'enemy') then
-                if math.abs(v.x - self.x) < hitbox and math.abs(v.y - self.y) < hitbox then
-                    local hitDir = normalizeAngle(getDir(v.x, v.y, self.x, self.y))
-                    local shieldHit = getShieldSide(v.dir, hitDir)
-                    local hitStrength = math.random(25) + 25
-                    log("Shield " .. shieldHit .. " HIT from angle " .. hitDir .. " for " .. hitStrength);
-                    v.shields[shieldHit] = v.shields[shieldHit] - hitStrength;
-                    remove(self)
-                    if (v.shields[shieldHit] <= 0) then
-                        table.insert(objects, Explosion:new(v.x, v.y))
-                        remove(v)
-                        gamestate.enemies = gamestate.enemies - 1
-                    else
-                        local littleExplosion = Explosion:new(v.x, v.y)
-                        littleExplosion.size = 20
-                        littleExplosion.seconds = .5
-                        table.insert(objects, littleExplosion)
-                    end
-                end
+            if string.find(k, 'enemy') and self:checkCollision(v) then
+                gamestate.enemies = gamestate.enemies - 1
             end
         end
     else 
-        if math.abs(myShip.x - self.x) < hitbox and math.abs(myShip.y - self.y) < hitbox then
-            local hitDir = normalizeAngle(getDir(myShip.x, myShip.y, self.x, self.y))
-            local shieldHit = getShieldSide(myShip.dir, hitDir)
-            local hitStrength = math.random(25) + 25
-            log("Shield " .. shieldHit .. " HIT from not my torp angle " .. hitDir .. " for " .. hitStrength);
-            myShip.shields[shieldHit] = myShip.shields[shieldHit] - hitStrength;
-            remove(self)
-            if (myShip.shields[shieldHit] <= 0) then
-                -- death
-                table.insert(objects, Explosion:new(myShip.x, myShip.y))
-                myShip.shields = {0, 0, 0, 0, 0, 0}
-                gamestate.dead = true
-                remove(myShip)
-            else
-                local littleExplosion = Explosion:new(myShip.x, myShip.y)
-                littleExplosion.size = 20
-                littleExplosion.seconds = .5
-                table.insert(objects, littleExplosion)
-            end
+        if self:checkCollision(myShip) then -- other death stuff
+            myShip.shields = {0, 0, 0, 0, 0, 0}
+            gamestate.dead = true
         end
     end
 end
