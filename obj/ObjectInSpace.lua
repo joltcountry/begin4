@@ -22,9 +22,6 @@ end
 function ObjectInSpace:update()
 end
 
-function ObjectInSpace:turn()
-end
-
 function ObjectInSpace:windowPositionX()
     local unit = viewport.size / gamestate.range
     local xOffset = self.x - viewport.centerX

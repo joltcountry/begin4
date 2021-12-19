@@ -15,7 +15,7 @@ function love.load()
 
 	love.window.setMode(1800,1400)
 	love.window.setTitle('Begin 4')
-	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 50, turn = 1, enemies = 3 }
+	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 50, enemies = 3 }
 	viewport = { x = 0, y = 0, size = 1400, centerX = 0, centerY = 0 }
 	objects = {}
 	
@@ -127,6 +127,3 @@ function love.update( dt )
 	end
 
 end
-
-
-

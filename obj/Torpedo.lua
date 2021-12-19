@@ -10,18 +10,6 @@ function Torpedo:new(x, y, drawer, dir, speed, proximity)
     return o
 end
 
-function Torpedo:turn()
-    track("torpedo turns", self.turns)
-    if not self.turns then
-        self.turns = 1
-    else
-        self.turns = self.turns + 1
-        if self.turns == 10 then
-            remove(self)
-        end
-    end
-end
-
 function Torpedo:draw()
     if self.shooter ~= myShip then
         love.graphics.setColor(1, 0, 0)
