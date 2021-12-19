@@ -11,14 +11,15 @@ end
 
 function drawLogs()
 
-	love.graphics.setColor(.3, .3, .9);
+	love.graphics.setFont(logFont)
+	love.graphics.setColor(.7, .7, .9);
 	local pos = 0
 	for k,v in pairs(trackers) do
-		love.graphics.print(k .. ': ' .. tostring(v), love.graphics.getWidth() - 300, pos * 20)
+		logPane:print(k .. ': ' .. tostring(v), 5, 5 + pos * 20)
 		pos = pos + 1
 	end
 	for i,v in ipairs(logs) do
-		love.graphics.print(v, love.graphics.getWidth() - 300, pos * 20)
+		logPane:print(v, 5, 5 + pos * 20)
 		pos = pos + 1
 	end
 

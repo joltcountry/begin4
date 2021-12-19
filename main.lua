@@ -11,7 +11,9 @@ function love.load()
 	local shipImage = love.graphics.newImage( "img/ship.png" )
 	local enemyImage = love.graphics.newImage( "img/enemy.png" )
 	background = love.graphics.newImage('img/stars.jpg')
-
+	titleFont = love.graphics.newFont(18)
+	mapFont = love.graphics.newFont(12)
+	logFont = love.graphics.newFont(16)
 	math.randomseed(os.time())
 
 	love.graphics.setBackgroundColor(.05, .1, .1)
@@ -71,15 +73,10 @@ function love.update( dt )
 			cycleTimer = 0
 		end
 
-		track("Ship speed", myShip.speed .. " km/s")
-		track("Ship heading", myShip.dir)
-		track("Enemies", gamestate.enemies)
-
-		if love.mouse.isDown(2) then
-			myShip.targetDir = myShip.dir
-			myShip.targetSpeed = myShip.speed
+		for k,v in pairs(panes) do
+			v:handle()
 		end
-
+	
 		for k,v in pairs(objects) do
 			v:update(dt)
 		end

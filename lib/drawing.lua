@@ -3,6 +3,7 @@ function drawRangeRings()
     local maxDimension = viewport.size
 
     love.graphics.setLineWidth(2)
+    love.graphics.setFont(mapFont)
 
 	for ringDistance = gamestate.ringSpacing, 100000, gamestate.ringSpacing do
 		local radius = ringDistance * maxDimension / gamestate.range / 2
@@ -16,6 +17,7 @@ end
 
 function drawNewNavigation(x, y)
 
+    love.graphics.setFont(mapFont)
     love.graphics.setLineWidth(3)
     love.graphics.setColor(.5, .3, .2)
     local radius = getDistance(myShip:windowPositionX(), myShip:windowPositionY(), x, y)

@@ -20,6 +20,7 @@ function viewport:draw()
 
 	if love.mouse.isDown(2) then -- right mouse button
 		x, y = love.mouse.getPosition()
+
 		if self:within(x, y) then
 			drawNewNavigation(x, y)
 		end
@@ -49,6 +50,22 @@ function viewport:draw()
 
 end
 
+function viewport:update()
+	if love.mouse.isDown(2) then
+		x, y = love.mouse.getPosition()
+		if self:within(x, y) then
+			myShip.targetDir = myShip.dir
+			myShip.targetSpeed = myShip.speed
+		end
+	end
+end
+
 logPane = Pane:new(true, 70, 5, 95, 40, 100)
+function logPane:background()
+	love.graphics.setColor(.2,.2,.3)
+	love.graphics.rectangle('fill', self.x, self.y, self.xWidth, self.yWidth)
+end
+
+logPane:setTitle("Debugging Logs")
 
 table.insert(panes, logPane);

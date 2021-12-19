@@ -2,13 +2,26 @@ function love.mousemoved(x, y, dx, dy, istouch )
     if (love.mouse.isDown(3)) then
         viewport.centerX = viewport.centerX - dx * (gamestate.range / 1000)
         viewport.centerY = viewport.centerY - dy * (gamestate.range / 1000)
+	elseif (love.mouse.isDown(1)) then
+		for k,v in pairs(panes) do
+			if v.movable and x > v.startX and x < v.endX and y > v.startY and y < v.startY + barHeight then
+				v.startX = v.startX + dx
+				v.startY = v.startY + dy
+				v.endX = v.startX + v.xWidth
+				v.endY = v.startY + v.yWidth
+				-- legacy
+				v.x = v.startX
+				v.y = v.startY
+
+			end
+		end
     end
 end
 
 function love.mousepressed(x, y, i)
 
 	if (i == 1) then
-		if (x < viewport.size and y < viewport.size) then
+		if (viewport:within(x, y)) then
 			local spread = 10
 			local volley = 3
 			local direction = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
@@ -33,7 +46,7 @@ function love.mousepressed(x, y, i)
 end
 
 function love.mousereleased( x, y, button, istouch, presses )
-	if button == 2 and x < viewport.size and y < viewport.size then
+	if button == 2 and viewport:within(x,y) then
 		myShip.targetDir = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
 		myShip.targetSpeed = getDistance(myShip:windowPositionX(), myShip:windowPositionY(), x, y) * 2
 		lastClickedX = x

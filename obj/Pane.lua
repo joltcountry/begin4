@@ -1,5 +1,7 @@
 Pane = {}
 
+barHeight = 30
+
 function Pane:new(movable, x1Percent, y1Percent, x2Percent, y2Percent, z)
     o = {}
     o.movable = movable
@@ -29,6 +31,10 @@ function Pane:init()
     self.size = math.max(self.xWidth, self.yWidth)
 end
 
+function Pane:setTitle(t)
+    self.title = t
+end
+
 function Pane:scissor()
     love.graphics.setScissor(self.startX, self.startY, self.xWidth, self.yWidth)
 end
@@ -38,21 +44,50 @@ function Pane:background() -- default
     love.graphics.rectangle('fill', self.x, self.y, self.xWidth, self.yWidth)
 end
 
-function Pane:draw() -- default, should be overridden
-    love.graphics.setColor(0, 1, 0);
-    love.graphics.rectangle('line', self.startX, self.startY, self.xWidth - love.graphics.getLineWidth(), self.yWidth - love.graphics.getLineWidth());
+function Pane:draw()
+end
+
+function Pane:print(s, x, y)
+    self:scissor()
+    if self.movable then
+        love.graphics.print(s, self.startX + x, self.startY + barHeight + y)
+    else
+        love.graphics.print(s, self.startX + x, self.startY + y)
+    end
+    love.graphics.setScissor()
 end
 
 function Pane:render()
     self:scissor()
     self:background()
     self:draw()
+
+    if (self.movable) then
+        love.graphics.setColor(.4, .4, .5)
+        love.graphics.rectangle('fill', self.startX, self.startY, self.xWidth, barHeight);
+        love.graphics.setColor(1,1,1);
+        love.graphics.setFont(titleFont)
+        love.graphics.printf(self.title, self.startX, self.startY + 4, self.xWidth, 'center')
+    end
+
     love.graphics.setScissor()
 	love.graphics.setColor(1,1,1);
 end
 
 function Pane:within(x, y)
-    return x >= self.startX and x <= self.endX and y >= self.startX and y <= self.endY
+    if (self.movable) then
+        return x >= self.startX and x <= self.endX and y >= self.startY + barHeight and y <= self.endY
+    else
+        return x >= self.startX and x <= self.endX and y >= self.startY and y <= self.endY
+    end
+end
+
+function Pane:preHandle()
+end
+
+function Pane:handle()
+    self:preHandle()
+    self:update()
 end
 
 function Pane:update()
