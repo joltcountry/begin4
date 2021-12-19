@@ -14,6 +14,7 @@ function love.load()
 
 	math.randomseed(os.time())
 
+	love.graphics.setBackgroundColor(.05, .1, .1)
 	setWindow(1920,1080)
 	love.window.setTitle('Begin 4')
 	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 50, enemies = 3 }

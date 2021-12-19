@@ -52,6 +52,9 @@ function love.keypressed(key)
 		setWindow(love.graphics.getWidth() * 1.2, love.graphics.getHeight() * 1.2)
 	elseif key == '-' then
 		setWindow(love.graphics.getWidth() * .8, love.graphics.getHeight() * .8)
+    elseif key == "f" then
+		love.window.setFullscreen(not love.window.getFullscreen())
+		resetPanes()
 	end
 end
 

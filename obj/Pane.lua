@@ -1,7 +1,8 @@
 Pane = {}
 
-function Pane:new(x1Percent, y1Percent, x2Percent, y2Percent, z)
+function Pane:new(movable, x1Percent, y1Percent, x2Percent, y2Percent, z)
     o = {}
+    o.movable = movable
     o.x1Percent = x1Percent or 0
     o.y1Percent = y1Percent or 0
     o.x2Percent = x2Percent or 100

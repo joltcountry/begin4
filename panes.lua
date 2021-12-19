@@ -1,6 +1,6 @@
 panes = {}
 
-viewport = Pane:new(3, 10, 75, 90)
+viewport = Pane:new()
 table.insert(panes, viewport)
 
 -- legacy
@@ -9,7 +9,7 @@ viewport.centerY = 0
 
 function viewport:background()
     love.graphics.setColor(.2, .2, .4)
-	love.graphics.draw(background, -1500 - (viewport.centerX/200), -1000 - (viewport.centerY/200));
+	love.graphics.draw(background, -500 - (viewport.centerX/200), -500 - (viewport.centerY/200));
 end
 
 function viewport:draw()
@@ -47,11 +47,8 @@ function viewport:draw()
 		end
 	end
 
-    love.graphics.setColor(1, .8, 0);
-    love.graphics.rectangle('line', self.startX, self.startY, self.xWidth - love.graphics.getLineWidth(), self.yWidth - love.graphics.getLineWidth());
-
 end
 
-logPane = Pane:new(70, 5, 95, 40, 100)
+logPane = Pane:new(true, 70, 5, 95, 40, 100)
 
 table.insert(panes, logPane);

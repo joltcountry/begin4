@@ -103,3 +103,9 @@ function setWindow(w, h)
         v:init()
     end
 end
+
+function resetPanes()
+    for k,v in pairs(panes) do
+        v:init()
+    end
+end
