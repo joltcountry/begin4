@@ -13,8 +13,8 @@ function love.mousepressed(x, y, i)
 			local volley = 3
 			local direction = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
 			local spacing = 0
-			local xVel = getXVel(direction, 5000) + myShip:xVel();
-			local yVel = getYVel(direction, 5000) + myShip:yVel();
+			local xVel = getXVel(direction, 7000) + myShip:xVel();
+			local yVel = getYVel(direction, 7000) + myShip:yVel();
 			local vector = getVector(xVel, yVel);
 			local start = direction
 			if (volley > 1) then
@@ -29,6 +29,7 @@ function love.mousepressed(x, y, i)
 		end
     end
 	:: done ::
+	
 end
 
 function love.mousereleased( x, y, button, istouch, presses )

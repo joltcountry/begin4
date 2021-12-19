@@ -50,8 +50,6 @@ end
 
 function drawArc(centerX, centerY, radius, startAngle, endAngle) 
     track('radius', radius)
-    track('startAngle', startAngle)
-    track('endAngle', endAngle)
     local startX, startY, endX, endY
     for a=startAngle,endAngle do
         startX = centerX + math.sin(math.rad(a)) * radius
@@ -91,4 +89,10 @@ end
 
 function perCycle(n)
     return n / gamestate.cycles
+end
+
+function getAngleDiff(currDir, targetDir)
+    local diff = targetDir - currDir
+    diff = (diff + 180) % 360 - 180
+    return diff
 end

@@ -23,11 +23,19 @@ function Torpedo:turn()
 end
 
 function Torpedo:draw()
-    love.graphics.setColor(1, 1, 1)
+    if self.shooter ~= myShip then
+        love.graphics.setColor(1, 0, 0)
+    else
+        love.graphics.setColor(1, 1, 1)
+    end
     love.graphics.circle('fill', self:windowPositionX(), self:windowPositionY(), 10 * (gamestate.scale * .5));
     love.graphics.setLineWidth(2);
     for i=1,5 do
-        love.graphics.setColor(math.random(), math.random(), math.random())
+        if self.shooter ~= myShip then
+            love.graphics.setColor(1, math.random(), math.random())
+        else
+            love.graphics.setColor(math.random(), math.random(), math.random())
+        end
         local dir = math.floor(math.random() * 360)
         local distance = (math.floor(math.random() * 20) + 10) * (gamestate.scale * .75)
         local endX = self:windowPositionX() + (math.sin(math.rad(dir)) * distance)

@@ -1,12 +1,16 @@
 require 'objects'
-require 'lib.utils'
-require 'lib.logging' 
 require 'events'
 require 'cycle'
+require 'lib.utils'
+require 'lib.logging'
+require 'lib.drawing'
 
 function love.load()
 
-	t = 0
+	local shipImage = love.graphics.newImage( "img/ship.png" )
+	local enemyImage = love.graphics.newImage( "img/enemy.png" )
+	background = love.graphics.newImage('img/stars.jpg')
+
 	math.randomseed(os.time())
 
 	love.window.setMode(1800,1400)
@@ -20,8 +24,7 @@ function love.load()
 	gamestate.windowOriginX = -(viewport.size / 2)
 	gamestate.windowOriginY = -(viewport.size / 2)
 
-	image = love.graphics.newImage( "img/ship.png" )
-	objects.myShip = Movable:new(0, 0, image)
+	objects.myShip = Movable:new(0, 0, shipImage)
 	myShip = objects.myShip -- convenience
 	myShip.targetDir = myShip.dir
 	myShip.targetSpeed = myShip.speed
@@ -29,92 +32,38 @@ function love.load()
 	myShip.shields = { 100, 100, 100, 100, 100, 100 }
 	myShip.shieldsRaised = true
 
-	enemyImage = love.graphics.newImage( "img/enemy.png" )
 	for i=1, gamestate.enemies do
-		local enemy = Movable:new(math.random() * 40000 - 20000, math.random() * 40000 - 20000, enemyImage, math.random(360), math.random(1500) + 500)
+		local enemy = Enemy:new(math.random() * 40000 - 20000, math.random() * 40000 - 20000, enemyImage, math.random(360), math.random(1500) + 500)
 		enemy.shields = { 100, 100, 100, 100, 100, 100 }
 		enemy.shieldsRaised = true
 		objects['enemy' .. i] = enemy
 	end
 
-	background = love.graphics.newImage('img/stars.jpg')
+	cycleTimer = 0
 
 end
 
 function love.draw()
 
-	local maxDimension = viewport.size
-
 	love.graphics.setScissor(viewport.x, viewport.y, viewport.size, viewport.size)
 	love.graphics.setColor(.2, .2, .4)
 	love.graphics.draw(background, -1500 - (viewport.centerX/200), -1000 - (viewport.centerY/200));
-	-- draw range rings
-	love.graphics.setLineWidth(2)
 
-	for ringDistance = gamestate.ringSpacing, 100000, gamestate.ringSpacing do
-		local radius = ringDistance * maxDimension / gamestate.range / 2
-		love.graphics.setColor(.3, .3, .4)
-		love.graphics.print(ringDistance, myShip:windowPositionX() - 20, myShip:windowPositionY() - radius - 20)
-		love.graphics.setColor(.1, .1, .2)
-		love.graphics.circle('line', myShip:windowPositionX(), myShip:windowPositionY(), radius)
-	end
+	drawRangeRings()
 
-	if love.mouse.isDown(2) then
+	-- Draw navigation lines
+
+	if love.mouse.isDown(2) then -- right mouse button
 		x, y = love.mouse.getPosition()
 		if x < viewport.size and y < viewport.size then
-			love.graphics.setLineWidth(3)
-			x, y = love.mouse.getPosition()
-			love.graphics.setColor(.5, .3, .2)
-			local radius = getDistance(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
-			local startAngle = myShip.dir
-			local endAngle = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
-			if endAngle < 0 then
-				endAngle = endAngle + 360
-			end
-			if math.abs(startAngle - endAngle) > 180 then
-				startAngle = startAngle + 360
-			end
-
-			love.graphics.setLineWidth(2)
-			love.graphics.arc('line', myShip:windowPositionX(), myShip:windowPositionY(), radius, getRad(startAngle), getRad(endAngle))
-			love.graphics.setColor(.2, .9, .4)
-			love.graphics.line(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
-			love.graphics.circle('fill', x, y, 10)
-			if x < myShip:windowPositionX() then
-				love.graphics.print("Heading: " .. math.floor(endAngle), x-120, y - 10)
-				love.graphics.print("Speed: " .. math.floor(getDistance(myShip:windowPositionX(), myShip:windowPositionY(), x, y) * 2) .. ' km/s', x-120, y + 10)
-			else
-				love.graphics.print("Heading: " .. math.floor(endAngle), x+20, y - 10)
-				love.graphics.print("Speed: " .. math.floor(getDistance(myShip:windowPositionX(), myShip:windowPositionY(), x, y) * 2) .. ' km/s', x+20, y + 10)
-			end
-
+			drawNewNavigation(x, y)
 		end
 	end
 
 	if normalizeAngle(myShip.targetDir) ~= normalizeAngle(myShip.dir) then
-		local radius = lastRadius
-		local startAngle = myShip.dir
-		local endAngle = myShip.targetDir
-		if endAngle < 0 then
-			endAngle = endAngle + 360
-		end
-		if math.abs(startAngle - endAngle) > 180 then
-			startAngle = startAngle + 360
-		end
-
-		local newX = myShip:windowPositionX() + math.sin(math.rad(endAngle)) * radius;
-		local newY = myShip:windowPositionY() - math.cos(math.rad(endAngle)) * radius;
-
-		love.graphics.setLineWidth(2)
-		love.graphics.setColor(.2, .1, .0)
-		love.graphics.arc('line', myShip:windowPositionX(), myShip:windowPositionY(), radius, getRad(startAngle), getRad(endAngle))
-		love.graphics.setColor(.05, .2, .1)
-		love.graphics.line(myShip:windowPositionX(), myShip:windowPositionY(), newX, newY)
-		love.graphics.circle('fill', newX, newY, 10)
+		drawOldNavigation()
 	end
 
-	love.graphics.setColor(1,1,1);
-	
 	for k,v in pairs(objects) do
 		v:draw()
 	end
@@ -125,17 +74,15 @@ function love.draw()
 		drawShields(myShip)
 	end
 
---	if (love.keyboard.isDown('lalt')) then
-		for k,v in pairs(objects) do
-			if string.find(k, 'enemy') then
-				if v.shieldsRaised then
-					drawShields(v)
-				end
+	for k,v in pairs(objects) do
+		if string.find(k, 'enemy') then
+			if v.shieldsRaised then
+				drawShields(v)
 			end
 		end
---	end
+	end
 
-	-----
+	-- Draw random crap to be removed/replaced
 
 	love.graphics.setScissor()
 
@@ -157,11 +104,12 @@ end
 function love.update( dt )
 
 	if not gamestate.dead then 
-		t = t + dt
 
-		if (love.keyboard.isDown('space') and t > perCycle(1)) then
+		cycleTimer = cycleTimer + dt
+
+		if (love.keyboard.isDown('space') and cycleTimer > perCycle(1)) then
 			cycle()
-			t = 0
+			cycleTimer = 0
 		end
 
 		track("Ship speed", myShip.speed .. " km/s")
@@ -177,6 +125,7 @@ function love.update( dt )
 			v:update(dt)
 		end
 	end
+
 end
 
 
