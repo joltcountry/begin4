@@ -96,3 +96,10 @@ function getAngleDiff(currDir, targetDir)
     diff = (diff + 180) % 360 - 180
     return diff
 end
+
+function setWindow(w, h)
+    love.window.setMode(w, h)
+    for k,v in pairs(panes) do
+        v:init()
+    end
+end

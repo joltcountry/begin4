@@ -26,12 +26,12 @@ function ObjectInSpace:windowPositionX()
     local unit = viewport.size / gamestate.range
     local xOffset = self.x - viewport.centerX
 
-    return viewport.x + viewport.size/2 + (xOffset * unit)
+    return viewport.x + viewport.xWidth/2 + (xOffset * unit)
 end
 
 function ObjectInSpace:windowPositionY()
     local unit = viewport.size / gamestate.range
     local yOffset = self.y - viewport.centerY
 
-    return viewport.y + viewport.size/2 + (yOffset * unit)
+    return viewport.y + viewport.yWidth/2 + (yOffset * unit)
 end

@@ -48,6 +48,10 @@ function love.keypressed(key)
 		logs = {}
 	elseif key == 'q' then
 		os.exit()
+	elseif key == '=' then
+		setWindow(love.graphics.getWidth() * 1.2, love.graphics.getHeight() * 1.2)
+	elseif key == '-' then
+		setWindow(love.graphics.getWidth() * .8, love.graphics.getHeight() * .8)
 	end
 end
 

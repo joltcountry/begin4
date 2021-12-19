@@ -4,6 +4,7 @@ require 'cycle'
 require 'lib.utils'
 require 'lib.logging'
 require 'lib.drawing'
+require 'panes'
 
 function love.load()
 
@@ -13,10 +14,9 @@ function love.load()
 
 	math.randomseed(os.time())
 
-	love.window.setMode(1800,1400)
+	setWindow(1920,1080)
 	love.window.setTitle('Begin 4')
 	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 50, enemies = 3 }
-	viewport = { x = 0, y = 0, size = 1400, centerX = 0, centerY = 0 }
 	objects = {}
 	
 	gamestate.windowWidth = love.graphics.getWidth()
@@ -45,58 +45,16 @@ end
 
 function love.draw()
 
-	love.graphics.setScissor(viewport.x, viewport.y, viewport.size, viewport.size)
-	love.graphics.setColor(.2, .2, .4)
-	love.graphics.draw(background, -1500 - (viewport.centerX/200), -1000 - (viewport.centerY/200));
+	table.sort(panes, function(a,b) return a.z < b.z end)
 
-	drawRangeRings()
-
-	-- Draw navigation lines
-
-	if love.mouse.isDown(2) then -- right mouse button
-		x, y = love.mouse.getPosition()
-		if x < viewport.size and y < viewport.size then
-			drawNewNavigation(x, y)
-		end
+	for k,v in pairs(panes) do
+		v:render()
 	end
-
-	if normalizeAngle(myShip.targetDir) ~= normalizeAngle(myShip.dir) then
-		drawOldNavigation()
-	end
-
-	for k,v in pairs(objects) do
-		v:draw()
-	end
-
-	-- Draw shields
-
-	if (myShip.shieldsRaised) then
-		drawShields(myShip)
-	end
-
-	for k,v in pairs(objects) do
-		if string.find(k, 'enemy') then
-			if v.shieldsRaised then
-				drawShields(v)
-			end
-		end
-	end
-
-	-- Draw random crap to be removed/replaced
-
-	love.graphics.setScissor()
-
-	love.graphics.setColor(1,1,1);
-
-	love.graphics.print("Zoom: " .. math.floor(gamestate.range) .. 'km', viewport.size - 100, viewport.size - 20)
 
 	drawLogs()
 
-	love.graphics.setColor(.6, .6, .6)
-	love.graphics.print("LMB: shoot, RMB: navigate, MMB: drag map, Wheel: zoom, Space: GO!, q: quit, `: reset logs", 20, 1350);
-	if (gamestate.enemies == 0) then
-		love.graphics.setColor(math.random(), math.random(), math.random())
-		love.graphics.print("YOU WON DA GAME!", 650 + math.random() * 100 - 50, 700 + math.random() * 100 - 50);
+	if gamestate.enemies == 0 then
+		log("You won the game!  Yay?")
 	end
 
 end
