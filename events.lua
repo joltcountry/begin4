@@ -66,7 +66,14 @@ function love.keypressed(key)
 	elseif key == '-' then
 		setWindow(love.graphics.getWidth() * .8, love.graphics.getHeight() * .8)
     elseif key == "f" then
-		love.window.setFullscreen(not love.window.getFullscreen())
+		if love.window.getFullscreen() then
+			love.window.setFullscreen(false);
+			setWindow(gamestate.previousWindowWidth, gamestate.previousWindowHeight)
+		else
+			gamestate.previousWindowWidth = love.graphics.getWidth()
+			gamestate.previousWindowHeight = love.graphics.getHeight()
+			love.window.setFullscreen(true)
+		end
 		resetPanes()
 	end
 end
