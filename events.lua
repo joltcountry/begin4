@@ -21,7 +21,7 @@ end
 function love.mousepressed(x, y, i)
 
 	if (i == 1) then
-		if (viewport:within(x, y)) then
+		if (viewport:isTopPane(x, y)) then
 			local spread = 10
 			local volley = 3
 			local direction = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)

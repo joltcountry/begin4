@@ -74,7 +74,7 @@ function love.update( dt )
 		end
 
 		for k,v in pairs(panes) do
-			v:handle()
+			v:update()
 		end
 	
 		for k,v in pairs(objects) do

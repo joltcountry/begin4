@@ -109,3 +109,16 @@ function resetPanes()
         v:init()
     end
 end
+
+function getTopPane(x, y)
+    local topPane
+    for k, v in pairs(panes) do
+        if v:within(x, y) then
+            if not topPane or v.z > topPane.z then
+                topPane = v
+                track('Top pane', k)
+            end
+        end
+    end
+    return topPane
+end

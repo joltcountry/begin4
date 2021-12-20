@@ -75,19 +75,15 @@ function Pane:render()
 end
 
 function Pane:within(x, y)
-    if (self.movable) then
-        return x >= self.startX and x <= self.endX and y >= self.startY + barHeight and y <= self.endY
-    else
+    -- if (self.movable) then
+    --     return x >= self.startX and x <= self.endX and y >= self.startY + barHeight and y <= self.endY
+    -- else
         return x >= self.startX and x <= self.endX and y >= self.startY and y <= self.endY
-    end
+--    end
 end
 
-function Pane:preHandle()
-end
-
-function Pane:handle()
-    self:preHandle()
-    self:update()
+function Pane:isTopPane(x, y)
+    return self == getTopPane(x, y)
 end
 
 function Pane:update()

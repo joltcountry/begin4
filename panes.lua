@@ -1,7 +1,7 @@
 panes = {}
 
 viewport = Pane:new()
-table.insert(panes, viewport)
+panes['viewport'] = viewport
 
 -- legacy
 viewport.centerX = 0
@@ -68,4 +68,4 @@ end
 
 logPane:setTitle("Debugging Logs")
 
-table.insert(panes, logPane);
+panes['logPane'] = logPane;
