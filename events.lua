@@ -60,7 +60,7 @@ function love.keypressed(key)
 	if key == '`' then
 		logs = {}
 	elseif key == 'q' then
-		os.exit()
+		love.event.quit()
 	elseif key == '=' then
 		setWindow(love.graphics.getWidth() * 1.2, love.graphics.getHeight() * 1.2)
 	elseif key == '-' then
