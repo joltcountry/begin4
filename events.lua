@@ -4,7 +4,8 @@ function love.mousemoved(x, y, dx, dy, istouch )
         viewport.centerY = viewport.centerY - dy * (gamestate.range / 1000)
 	elseif (love.mouse.isDown(1)) then
 		for k,v in pairs(panes) do
-			if v.movable and x > v.startX and x < v.endX and y > v.startY and y < v.startY + barHeight then
+			if v.movable and v.dragging then
+				v.dragging = true
 				v.startX = v.startX + dx
 				v.startY = v.startY + dy
 				v.endX = v.startX + v.xWidth
@@ -39,6 +40,12 @@ function love.mousepressed(x, y, i)
 				torpedo.shooter = myShip
 				table.insert(objects, torpedo)
 			end
+		else
+			for k, v in pairs(panes) do
+				if v.movable and x > v.startX and x < v.endX and y > v.startY and y < v.startY + barHeight then
+					v.dragging = true
+				end
+			end
 		end
     end
 	:: done ::
@@ -46,6 +53,10 @@ function love.mousepressed(x, y, i)
 end
 
 function love.mousereleased( x, y, button, istouch, presses )
+	for k,v in pairs(panes) do
+		v.dragging = false
+	end
+	
 	if button == 2 and viewport:within(x,y) then
 		myShip.targetDir = getDir(myShip:windowPositionX(), myShip:windowPositionY(), x, y)
 		myShip.targetSpeed = getDistance(myShip:windowPositionX(), myShip:windowPositionY(), x, y) * 2
