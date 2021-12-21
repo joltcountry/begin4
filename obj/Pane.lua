@@ -2,13 +2,14 @@ Pane = {}
 
 barHeight = 30
 
-function Pane:new(movable, x1Percent, y1Percent, x2Percent, y2Percent, z)
+function Pane:new(movable, x1Percent, y1Percent, x2Percent, y2Percent, scale, z)
     o = {}
     o.movable = movable
     o.x1Percent = x1Percent or 0
     o.y1Percent = y1Percent or 0
     o.x2Percent = x2Percent or 100
     o.y2Percent = y2Percent or 100
+    o.scale = scale
     o.z = z or 0
     setmetatable(o, self)
     self.__index = self
@@ -19,12 +20,30 @@ end
 function Pane:init()
     local windowWidth = love.graphics.getWidth()
 	local windowHeight = love.graphics.getHeight()
-    self.startX = self.x1Percent / 100 * windowWidth
-    self.startY = self.y1Percent / 100 * windowHeight
-    self.endX = self.x2Percent / 100 * windowWidth - 1
-    self.endY = self.y2Percent / 100 * windowHeight - 1
-    self.xWidth = self.endX - self.startX
-    self.yWidth = self.endY - self.startY
+    log("its " .. windowWidth .."/"..windowHeight)
+    if not windowsInitialized then
+        self.startX = self.x1Percent / 100 * windowWidth
+        self.startY = self.y1Percent / 100 * windowHeight
+        self.endX = self.startX + ((self.x2Percent - self.x1Percent) / 100 * windowWidth) - 1
+        self.endY = self.startY + ((self.y2Percent - self.y1Percent) / 100 * windowHeight) - 1
+        self.xWidth = self.endX - self.startX
+        self.yWidth = self.endY - self.startY
+    else
+        local oldPercentX = self.startX / oldWidth
+        local oldPercentY = self.startY / oldHeight 
+        self.startX = oldPercentX * windowWidth
+        self.startY = oldPercentY * windowHeight
+        if self.scale then
+            self.endX = self.startX + ((self.x2Percent - self.x1Percent) / 100 * windowWidth) - 1
+            self.endY = self.startY + ((self.y2Percent - self.y1Percent) / 100 * windowHeight) - 1
+            self.xWidth = self.endX - self.startX
+            self.yWidth = self.endY - self.startY
+        else
+            self.endX = self.startX + self.xWidth
+            self.endY = self.startY + self.yWidth
+        end
+    end        
+    
     -- legacy
     self.x = self.startX
     self.y = self.startY

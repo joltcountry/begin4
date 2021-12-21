@@ -54,8 +54,6 @@ function love.draw()
 		v:render()
 	end
 
-	drawLogs()
-
 	if gamestate.enemies == 0 then
 		log("You won the game!  Yay?")
 	end

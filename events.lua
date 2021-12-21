@@ -43,6 +43,10 @@ function love.mousepressed(x, y, i)
 		else
 			for k, v in pairs(panes) do
 				if v.movable and x > v.startX and x < v.endX and y > v.startY and y < v.startY + barHeight then
+					local topZ = getTopZ()
+					track('topz was', topZ)
+					v.z = topZ + 1
+					track('v.z is now', v.z)
 					v.dragging = true
 				end
 			end

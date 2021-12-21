@@ -11,7 +11,7 @@ end
 
 function printTable(t)
     for k,v in pairs(t) do
-        print(k..'..'..v)
+        print(k)
     end
 end
     
@@ -98,10 +98,13 @@ function getAngleDiff(currDir, targetDir)
 end
 
 function setWindow(w, h)
+    oldWidth = love.graphics.getWidth()
+    oldHeight = love.graphics.getHeight()
     love.window.setMode(w, h)
     for k,v in pairs(panes) do
         v:init()
     end
+    windowsInitialized = true
 end
 
 function resetPanes()
@@ -121,4 +124,12 @@ function getTopPane(x, y)
         end
     end
     return topPane
+end
+
+function getTopZ()
+    local topZ
+    for k, v in pairs(panes) do
+        if not topZ or v.z > topZ then topZ = v.z end
+    end
+    return topZ
 end

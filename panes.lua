@@ -1,8 +1,9 @@
 panes = {}
 
 viewport = Pane:new()
-panes['viewport'] = viewport
-
+table.insert(panes, viewport)
+viewport.scale = true
+viewport.z = -1
 -- legacy
 viewport.centerX = 0
 viewport.centerY = 0
@@ -60,12 +61,29 @@ function viewport:update()
 	end
 end
 
-logPane = Pane:new(true, 70, 5, 95, 40, 100)
+logPane = Pane:new(true, 70, 5, 95, 40, false)
 function logPane:background()
 	love.graphics.setColor(.2,.2,.3)
 	love.graphics.rectangle('fill', self.x, self.y, self.xWidth, self.yWidth)
 end
-
+function logPane:draw()
+	drawLogs()
+end
 logPane:setTitle("Debugging Logs")
+table.insert(panes, logPane)
 
-panes['logPane'] = logPane;
+shieldPane = Pane:new(true, 0, 40, 7, 57, true)
+shieldPane:setTitle("Shields")
+table.insert(panes, shieldPane)
+function shieldPane:background()
+	love.graphics.setColor(.1, .05, .15)
+	love.graphics.rectangle('fill', self.startX, self.startY, self.xWidth, self.yWidth)
+end
+
+function shieldPane:draw()
+	love.graphics.setFont(logFont)
+	love.graphics.setColor(1,1,1)
+	for i=1,6 do
+		self:print('Shield ' .. i .. ': ' .. myShip.shields[i] .. '%', 5, i * 20)
+	end
+end
