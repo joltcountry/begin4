@@ -5,6 +5,7 @@ function Torpedo:new(x, y, drawer, dir, speed, proximity)
     o.dir = dir or 0
     o.speed = speed or 0
     o.proximity = proximity or 300
+    o.duration = 5
     self.__index = self
     setmetatable(o, self)
     return o
@@ -56,13 +57,18 @@ function Torpedo:checkCollision(o)
 end
 
 function Torpedo:update()
-    for k,v in pairs(objects) do
-        if string.find(k, 'enemy') and self:checkCollision(v) then
-            gamestate.enemies = gamestate.enemies - 1
+    
+    if self.lifespan / gamestate.cycles > self.duration then
+        remove(self)
+    else
+        for k,v in pairs(objects) do
+            if string.find(k, 'enemy') and self:checkCollision(v) then
+                gamestate.enemies = gamestate.enemies - 1
+            end
         end
-    end
-    if self:checkCollision(myShip) then -- other death stuff
-        myShip.shields = {0, 0, 0, 0, 0, 0}
-        gamestate.dead = true
+        if self:checkCollision(myShip) then -- other death stuff
+            myShip.shields = {0, 0, 0, 0, 0, 0}
+            gamestate.dead = true
+        end
     end
 end

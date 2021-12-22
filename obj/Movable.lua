@@ -4,6 +4,7 @@ function Movable:new(x, y, drawer, dir, speed)
     o = ObjectInSpace:new(x, y, drawer)
     o.dir = dir or 0
     o.speed = speed or 0
+    o.lifespan = 0
     self.__index = self
     setmetatable(o, self)
     return o
@@ -29,6 +30,7 @@ end
 function Movable:move(dt)
     self.x = self.x + (math.sin(math.rad(self.dir)) * self.speed * perCycle(1))
     self.y = self.y - (math.cos(math.rad(self.dir)) * self.speed * perCycle(1))
+    self.lifespan = self.lifespan + 1
 end
 
 function Movable:xVel()
