@@ -19,7 +19,7 @@ function love.load()
 	love.graphics.setBackgroundColor(.05, .1, .1)
 	setWindow(1920,1080)
 	love.window.setTitle('Begin 4')
-	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 50, enemies = 3 }
+	gamestate = { scale = 1, range = 30000, ringSpacing = 10000, cycles = 20, enemies = 3 }
 	objects = {}
 	
 	gamestate.windowWidth = love.graphics.getWidth()
@@ -68,7 +68,7 @@ function love.update( dt )
 
 		if (love.keyboard.isDown('space') and cycleTimer > perCycle(1)) then
 			cycle()
-			cycleTimer = 0
+			cycleTimer = cycleTimer % perCycle(1)
 		end
 
 		for k,v in pairs(panes) do
